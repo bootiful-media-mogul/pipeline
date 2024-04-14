@@ -1,23 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    # networking.gke.io/v1beta1.FrontendConfig: "joshlong-authorization-api-frontend-config"
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    networking.gke.io/managed-certificates: "authorization-service-certificate"
+    kubernetes.io/ingress.global-static-ip-name: "mogul-authorization-service-ip"
+  name: authorization-service-ingress
+spec:
+  defaultBackend:
+    service:
+      name: authorization-service
+      port:
+        number: 80
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+
+metadata:
+  name: authorization-service-certificate
+spec:
+  domains:
+    - authorization.media-mogul.io
+
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: mogul-service
-  name: mogul-service
+    app: authorization-service
+  name: authorization-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mogul-service
+      app: authorization-service
   template:
     metadata:
       labels:
-        app: mogul-service
+        app: authorization-service
     spec:
       containers:
-        - image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
+        - image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
           imagePullPolicy: Always
-          name: mogul-service
+          name: authorization-service
 
           startupProbe:
             failureThreshold: 100
@@ -40,9 +68,16 @@ spec:
               port: 8080
               path: /actuator/health/liveness
 
-          #          envFrom:
-          #            - secretRef:
-          #                name: joshlong-authorization-api-secrets
+
+          envFrom:
+            - secretRef:
+                name: mogul-secrets
+
+          resources:
+            limits:
+              memory: "1Gi"
+            requests:
+              memory: "1Gi"
 
           env:
 
@@ -62,13 +97,13 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
   labels:
-    app: mogul-service
-  name: mogul-service
+    app: authorization-service
+  name: authorization-service
 spec:
   ports:
     - port: 80
       targetPort: 8080
       name: http
   selector:
-    app: mogul-service
+    app: authorization-service
   type: LoadBalancer
