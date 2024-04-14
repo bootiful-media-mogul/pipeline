@@ -1,9 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-
   annotations:
-    # networking.gke.io/v1beta1.FrontendConfig: "joshlong-authorization-api-frontend-config"
     ingress.kubernetes.io/force-ssl-redirect: "true"
     networking.gke.io/managed-certificates: "studio-certificate"
     kubernetes.io/ingress.global-static-ip-name: "mogul-studio-ip"
@@ -28,7 +26,7 @@ metadata:
   name: studio-certificate
 spec:
   domains:
-    - "auth.media-mogul.io"
+    - "studio.media-mogul.io"
 
 ---
 apiVersion: apps/v1
