@@ -35,4 +35,5 @@ write_secrets
 create_ip ${STUDIO_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
 
+kubectl delete -f $ROOT_DIR/k8s
 kubectl apply -f $ROOT_DIR/k8s
