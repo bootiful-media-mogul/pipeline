@@ -22,7 +22,7 @@ metadata:
   name: authorization-service-certificate
 spec:
   domains:
-    - authorization.media-mogul.io
+    - auth.media-mogul.io
 
 
 ---
