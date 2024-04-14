@@ -8,6 +8,7 @@ echo "The root directory is ${ROOT_DIR}."
 export NAMESPACE_NAME=mogul
 
 AUTHORIZATION_SERVICE_IP=${NAMESPACE_NAME}-authorization-service-ip
+STUDIO_IP=${NAMESPACE_NAME}-studio-ip
 
 create_ip(){
   ipn=$1
@@ -31,6 +32,7 @@ EOF
 
 write_secrets
 
+create_ip ${STUDIO_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
 
 kubectl apply -f $ROOT_DIR/k8s
