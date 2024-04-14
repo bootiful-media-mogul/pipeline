@@ -7,6 +7,7 @@ env:
   GCLOUD_PROJECT: joshlong
   GKE_CLUSTER: joshlong
   GCLOUD_ZONE: us-east4
+  NS_NAME: mogul
 
 on:
   repository_dispatch:
