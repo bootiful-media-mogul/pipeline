@@ -3,8 +3,8 @@ name: Deploy
 env:
 
   GCLOUD_SA_KEY:  ${{ secrets.GCLOUD_SA_KEY }}
-  GCLOUD_PROJECT: joshlong
   GH_PAT: ${{ secrets.MOGUL_GITHUB_PERSONAL_ACCESS_TOKEN }}
+  GCLOUD_PROJECT: joshlong
   GKE_NAME: joshlong
 
 on:
@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+
       - uses: actions/checkout@v3
 
       - uses: 'google-github-actions/auth@v2'
@@ -32,16 +33,13 @@ jobs:
           gcloud config set project $GCLOUD_PROJECT 
           gcloud --quiet auth configure-docker us-docker.pkg.dev
 
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: 21
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Log in to Google Artifact Registry
-        uses: docker/login-action@v1
-        with:
-          registry: gcr.io
-          username: _json_key
-          password: ${{ env.GCLOUD_SA_KEY }}
 
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
@@ -52,7 +50,7 @@ jobs:
           export_default_credentials: true
 
       - name: 'Use gcloud CLI'
-        run: 'gcloud info'
+        run:  gcloud info
 
       - name: Configure kubectl
         run: gcloud container clusters get-credentials $GKE_NAME --zone us-east4 --project $GCLOUD_PROJECT
