@@ -43,4 +43,4 @@ jobs:
           password: ${{ env.GCLOUD_SA_KEY }}
 
       - name: Publish Container
-        run: echo "running the pipeline"
+        run: $GITHUB_WORKSPACE/bin/deploy.sh
