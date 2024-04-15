@@ -15,6 +15,7 @@ spec:
       containers:
         - name: mogul-service-container
           image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
+          imagePullPolicy: Always
           envFrom:
             - secretRef:
                 name: mogul-secrets
