@@ -25,6 +25,17 @@ spec:
             - name: LANG
               value: "en_US.UTF-8"
 
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: authorization-service-certificate
+spec:
+  domains:
+    - "auth.media-mogul.io"
+
+
 ---
 apiVersion: v1
 kind: Service
@@ -44,11 +55,13 @@ kind: Ingress
 metadata:
   name: authorization-service-ingress
   annotations:
+    ingress.kubernetes.io/force-ssl-redirect: "true"
     kubernetes.io/ingress.global-static-ip-name: "mogul-authorization-service-ip"
-    networking.gke.io/managed-certificates: "false"
+    networking.gke.io/managed-certificates: "authorization-service-certificate"
 spec:
   rules:
-    - http:
+    - host: auth.media-mogul.io
+      http:
         paths:
           - pathType: ImplementationSpecific
             path: "/*"
