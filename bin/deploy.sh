@@ -38,4 +38,4 @@ create_ip ${AUTHORIZATION_SERVICE_IP}
 create_ip ${MOGUL_SERVICE_IP}
 
 kubectl delete -f $ROOT_DIR/k8s
-kubectl apply -f $ROOT_DIR/k8s
+kubectl apply -f $ROOT_DIR/k8s/authorization-service.yml

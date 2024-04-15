@@ -4,8 +4,8 @@ metadata:
 
   annotations:
     # networking.gke.io/v1beta1.FrontendConfig: "joshlong-authorization-api-frontend-config"
-    ingress.kubernetes.io/force-ssl-redirect: "true"
-    networking.gke.io/managed-certificates: "authorization-service-certificate"
+#    ingress.kubernetes.io/force-ssl-redirect: "true"
+#    networking.gke.io/managed-certificates: "authorization-service-certificate"
     kubernetes.io/ingress.global-static-ip-name: "mogul-authorization-service-ip"
   name: authorization-service-ingress
 spec:
@@ -21,14 +21,14 @@ spec:
                 port:
                   number: 8080
 
----
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: authorization-service-certificate
-spec:
-  domains:
-    - "auth.media-mogul.io"
+#---
+#apiVersion: networking.gke.io/v1
+#kind: ManagedCertificate
+#metadata:
+#  name: authorization-service-certificate
+#spec:
+#  domains:
+#    - "auth.media-mogul.io"
 
 ---
 apiVersion: apps/v1
