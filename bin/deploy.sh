@@ -25,11 +25,13 @@ write_secrets(){
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
   cat <<EOF >${SECRETS_FN}
-MESSAGE=hik8s
+MESSAGE=ohai
 EOF
-  kubectl delete secrets $SECRETS || echo "no secrets to delete."
-  kubectl create secret generic $SECRETS --from-env-file $SECRETS_FN
+  kubectl delete secrets -n $NAMESPACE_NAME $SECRETS || echo "no secrets to delete."
+  kubectl create secret generic $SECRETS -n $NAMESPACE_NAME --from-env-file $SECRETS_FN
 }
+
+kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
 write_secrets
 
@@ -37,5 +39,5 @@ create_ip ${MOGUL_CLIENT_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
 create_ip ${MOGUL_SERVICE_IP}
 
-kubectl delete -f $ROOT_DIR/k8s
-kubectl apply -f $ROOT_DIR/k8s/authorization-service.yml
+#kubectl delete -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
+kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s/authorization-service.yml
