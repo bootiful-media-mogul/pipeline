@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# this pipeline deploys everything, altogether. if the assets are already
-# deployed then its idempotent and nothing should happen. right?
-
 export ROOT_DIR="$(cd `dirname $0` && pwd )"
 echo "The root directory is ${ROOT_DIR}."
 export NAMESPACE_NAME=mogul
