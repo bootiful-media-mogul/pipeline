@@ -1,0 +1,98 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    networking.gke.io/managed-certificates: "mogul-service-certificate"
+    kubernetes.io/ingress.global-static-ip-name: "mogul-mogul-service-ip"
+  name: authorization-service-ingress
+spec:
+  rules:
+    - host: api.media-mogul.io
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: authorization-service
+                port:
+                  number: 8080
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: mogul-service-certificate
+spec:
+  domains:
+    - "api.media-mogul.io"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mogul-service
+  name: mogul-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mogul-service
+  template:
+    metadata:
+      labels:
+        app: mogul-service
+    spec:
+      containers:
+        - image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
+          imagePullPolicy: Always
+          name: mogul-service
+          startupProbe:
+            failureThreshold: 100
+            periodSeconds: 10
+            httpGet:
+              port: 8080
+              path: /actuator/health/readiness
+          readinessProbe:
+            failureThreshold: 100
+            periodSeconds: 10
+            httpGet:
+              port: 8080
+              path: /actuator/health/readiness
+          livenessProbe:
+            failureThreshold: 100
+            periodSeconds: 10
+            httpGet:
+              port: 8080
+              path: /actuator/health/liveness
+          envFrom:
+            - secretRef:
+                name: mogul-secrets
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: LANG
+              value: "en_US.UTF-8"
+
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mogul-service
+  annotations:
+    cloud.google.com/neg: '{ "ingress": true }'
+spec:
+  type: NodePort
+  selector:
+    app: mogul-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+

@@ -9,6 +9,7 @@ export NAMESPACE_NAME=mogul
 
 AUTHORIZATION_SERVICE_IP=${NAMESPACE_NAME}-authorization-service-ip
 STUDIO_IP=${NAMESPACE_NAME}-studio-ip
+MOGUL_SERVICE_IP=${NAMESPACE_NAME}-mogul-service-ip
 
 create_ip(){
   ipn=$1
@@ -34,6 +35,7 @@ write_secrets
 
 create_ip ${STUDIO_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
+create_ip ${MOGUL_SERVICE_IP}
 
 kubectl delete -f $ROOT_DIR/k8s
 kubectl apply -f $ROOT_DIR/k8s
