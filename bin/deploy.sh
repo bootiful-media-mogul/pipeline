@@ -39,5 +39,4 @@ create_ip ${MOGUL_CLIENT_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
 create_ip ${MOGUL_SERVICE_IP}
 
-#kubectl delete -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
-kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s/authorization-service.yml
+kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
