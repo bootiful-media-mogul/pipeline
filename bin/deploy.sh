@@ -8,7 +8,7 @@ echo "The root directory is ${ROOT_DIR}."
 export NAMESPACE_NAME=mogul
 
 AUTHORIZATION_SERVICE_IP=${NAMESPACE_NAME}-authorization-service-ip
-STUDIO_IP=${NAMESPACE_NAME}-studio-ip
+MOGUL_CLIENT_IP=${NAMESPACE_NAME}-mogul-client-ip
 MOGUL_SERVICE_IP=${NAMESPACE_NAME}-mogul-service-ip
 
 create_ip(){
@@ -33,7 +33,7 @@ EOF
 
 write_secrets
 
-create_ip ${STUDIO_IP}
+create_ip ${MOGUL_CLIENT_IP}
 create_ip ${AUTHORIZATION_SERVICE_IP}
 create_ip ${MOGUL_SERVICE_IP}
 

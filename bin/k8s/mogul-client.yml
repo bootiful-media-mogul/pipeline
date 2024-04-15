@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   annotations:
     ingress.kubernetes.io/force-ssl-redirect: "true"
-    networking.gke.io/managed-certificates: "studio-certificate"
-    kubernetes.io/ingress.global-static-ip-name: "mogul-studio-ip"
+    networking.gke.io/managed-certificates: "mogul-client-certificate"
+    kubernetes.io/ingress.global-static-ip-name: "mogul-mogul-client-ip"
   name: authorization-service-ingress
 spec:
   rules:
@@ -23,7 +23,7 @@ spec:
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: studio-certificate
+  name: mogul-client-certificate
 spec:
   domains:
     - "studio.media-mogul.io"
@@ -33,22 +33,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: studio
-  name: studio
+    app: mogul-client
+  name: mogul-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: studio
+      app: mogul-client
   template:
     metadata:
       labels:
-        app: studio
+        app: mogul-client
     spec:
       containers:
         - image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
           imagePullPolicy: Always
-          name: studio
+          name: mogul-client
           startupProbe:
             failureThreshold: 100
             periodSeconds: 10
@@ -83,13 +83,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: studio
+  name: mogul-client
   annotations:
     cloud.google.com/neg: '{ "ingress": true }'
 spec:
   type: NodePort
   selector:
-    app: studio
+    app: mogul-client
   ports:
     - port: 8080
       targetPort: 8080
