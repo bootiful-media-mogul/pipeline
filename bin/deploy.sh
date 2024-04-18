@@ -40,6 +40,8 @@ PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
 PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
 PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
 IDP_ISSUER_URI=http://localhost:9090
+SETTINGS_PASSWORD=${SETTINGS_PASSWORD}
+SETTINGS_SALT=${SETTINGS_SALT}
 EOF
 
   kubectl delete secrets -n $NAMESPACE_NAME $SECRETS || echo "no secrets to delete."
