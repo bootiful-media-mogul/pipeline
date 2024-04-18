@@ -20,8 +20,6 @@ spec:
             - secretRef:
                 name: mogul-secrets
           env:
-            - name: SPRING_APPLICATION_NAME
-              value: "mogul-service"
             - name: SERVER_PORT
               value: "8080"
             - name: LANG
