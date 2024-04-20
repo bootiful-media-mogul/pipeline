@@ -59,7 +59,7 @@ kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 for f in authorization-service mogul-service  ; do
   Y=${f}-data.yml
   D=deployments/${f}-deployment
-  kubectl delete  -n $NAMESPACE_NAME -f $D || echo "no deployment to delete for ${D}."
+  kubectl delete  -n $NAMESPACE_NAME   $D || echo "no deployment to delete for ${D}."
   echo "applying ${Y} ..."
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml | kubectl apply -n $NAMESPACE_NAME  -f -
 done
