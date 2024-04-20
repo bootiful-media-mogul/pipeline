@@ -61,7 +61,7 @@ for f in authorization-service-data.yml mogul-service-data.yml ; do
   F=$ROOT_DIR/resolved.yml
   rm -rf $F
   kbld -f "$ROOT_DIR"/k8s/carvel/$f  > $F
-  ytt -f  $F -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml   | kubectl apply -f -
+  ytt -f  $F -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml
 done
 
 
