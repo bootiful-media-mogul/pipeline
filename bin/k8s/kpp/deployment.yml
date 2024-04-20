@@ -1,0 +1,81 @@
+#@ load("@ytt:data", "data")
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: #@ str(data.values.service) + '-deployment'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: #@ str(data.values.service)
+  template:
+    metadata:
+      labels:
+        app: #@ str(data.values.service)
+    spec:
+
+
+      containers:
+        - name: #@ data.values.service  + '-container'
+          image: #@ data.values.container
+          imagePullPolicy: Always
+
+          #@ if/end data.values.probes:
+          livenessProbe: #@ data.values.probes.livenessProbe
+          readinessProbe: #@ data.values.probes.readinessProbe
+          ports:
+            - containerPort:  #@ data.values.port
+          envFrom:
+            - secretRef:
+                name: mogul-secrets
+          env:
+            - name: SERVER_PORT
+              value:  #@ str(data.values.port)
+            - name: LANG
+              value: "en_US.UTF-8"
+
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: #@ data.values.service  + '-certificate'
+spec:
+  domains:
+    -  #@ str(data.values.url)
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: #@ data.values.service  + '-service'
+spec:
+  type: NodePort
+  selector:
+    app: #@ data.values.service
+  ports:
+    - port:  #@ data.values.port
+      targetPort:  #@ data.values.port
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: #@ data.values.service  + '-ingress'
+  annotations:
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.global-static-ip-name: #@  'mogul-' + data.values.service +'-ip'
+    networking.gke.io/managed-certificates: #@  data.values.service +'-certificate'
+spec:
+  rules:
+    - host: #@ data.values.url
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: "/*"
+            backend:
+              service:
+                name:  #@ data.values.service + '-service'
+                port:
+                  number:  #@ data.values.port

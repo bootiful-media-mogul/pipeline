@@ -50,10 +50,12 @@ EOF
 
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
-write_secrets
+#write_secrets
+#
+#create_ip ${MOGUL_CLIENT_IP}
+#create_ip ${AUTHORIZATION_SERVICE_IP}
+#create_ip ${MOGUL_SERVICE_IP}
 
-create_ip ${MOGUL_CLIENT_IP}
-create_ip ${AUTHORIZATION_SERVICE_IP}
-create_ip ${MOGUL_SERVICE_IP}
+ytt -f  $ROOT_DIR/k8s/kpp/mogul-service-data.yml  -f   $ROOT_DIR/k8s/kpp/data-schema.yml -f   $ROOT_DIR/k8s/kpp/deployment.yml | kubectl apply
 
-kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
+#kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s

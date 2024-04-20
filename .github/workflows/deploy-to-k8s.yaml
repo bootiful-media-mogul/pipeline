@@ -65,6 +65,12 @@ jobs:
           gcloud --quiet auth configure-docker
           kubectl get pods
 
+      - name: Set up Carvel Tools
+        run: |
+          curl -L https://carvel.dev/install.sh | bash
+          export PATH="$PATH:/usr/local/bin"
+          ytt version
+
       - name: Deploy
         run: |
           kubectl get ns/$NS_NAME || kubectl create ns $NS_NAME 
