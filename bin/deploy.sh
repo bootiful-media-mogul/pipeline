@@ -50,11 +50,11 @@ EOF
 
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
-write_secrets
-
-create_ip ${MOGUL_CLIENT_IP}
-create_ip ${AUTHORIZATION_SERVICE_IP}
-create_ip ${MOGUL_SERVICE_IP}
+#write_secrets
+#
+#create_ip ${MOGUL_CLIENT_IP}
+#create_ip ${AUTHORIZATION_SERVICE_IP}
+#create_ip ${MOGUL_SERVICE_IP}
 
 for f in authorization-service mogul-service  ; do
   Y=${f}-data.yml
