@@ -50,15 +50,18 @@ EOF
 
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
-#write_secrets
+write_secrets
 
-#create_ip ${MOGUL_CLIENT_IP}
-#create_ip ${AUTHORIZATION_SERVICE_IP}
-#create_ip ${MOGUL_SERVICE_IP}
+create_ip ${MOGUL_CLIENT_IP}
+create_ip ${AUTHORIZATION_SERVICE_IP}
+create_ip ${MOGUL_SERVICE_IP}
 
 for f in authorization-service-data.yml mogul-service-data.yml ; do
   echo "applying $f ..."
-  ytt -f  $ROOT_DIR/k8s/kpp/$f   -f   $ROOT_DIR/k8s/kpp/data-schema.yml -f   $ROOT_DIR/k8s/kpp/deployment.yml   | kubectl apply -f -
+  F=$ROOT_DIR/resolved.yml
+  rm -rf $F
+  kbld -f "$ROOT_DIR"/k8s/carvel/$f  > $F
+  ytt -f  $F -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml   | kubectl apply -f -
 done
 
 
