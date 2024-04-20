@@ -14,8 +14,28 @@ spec:
     spec:
       containers:
         - name: mogul-service-container
-          image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
+          image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service@sha256:294efa7ecdb60bf4c574549cf5cd0bee834088f951afdd187a8c7c0e0683b481
+
+          # image: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
+
           imagePullPolicy: Always
+
+          readinessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 120
+            httpGet:
+              port: 8080
+              path: /actuator/health/readiness
+
+          livenessProbe:
+            initialDelaySeconds: 120
+            periodSeconds: 120
+            httpGet:
+              port: 8080
+              path: /actuator/health/liveness
+
+          ports:
+            - containerPort: 8080
           envFrom:
             - secretRef:
                 name: mogul-secrets
