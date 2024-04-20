@@ -1,9 +1,9 @@
 #@data/values
 
 ---
-service: mogul-service
-container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
-url: api.media-mogul.io
+service: authorization-service
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
+url: auth.media-mogul.io
 port: 8080
 probes:
   readinessProbe:
