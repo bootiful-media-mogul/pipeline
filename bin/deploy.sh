@@ -57,15 +57,15 @@ kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 #create_ip ${MOGUL_SERVICE_IP}
 
 for f in authorization-service mogul-service  ; do
-  Y=${f}-data.yml
+  Y=app-${f}-data.yml
   cd $ROOT_DIR/k8s/carvel/
   D=deployments/${f}-deployment
   echo "going to delete ${D}."
   kubectl delete -n $NAMESPACE_NAME $D || echo "could not delete deployment ${D}."
   echo "applying ${Y} ..."
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml > out.yml
-  cat out.yml |   kubectl apply -f -
+  cat out.yml |   kubectl apply  -n $NAMESPACE_NAME -f -
   cat out.yml
-#   | kubectl apply -n $NAMESPACE_NAME  -f -
+#   | kubectl apply -f -
 done
 #kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
