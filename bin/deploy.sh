@@ -64,6 +64,7 @@ for f in authorization-service mogul-service  ; do
   kubectl delete -n $NAMESPACE_NAME $D || echo "could not delete deployment ${D}."
   echo "applying ${Y} ..."
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml > out.yml
+  cat out.yml |   kubectl apply -f -
   cat out.yml
 #   | kubectl apply -n $NAMESPACE_NAME  -f -
 done
