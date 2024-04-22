@@ -22,7 +22,10 @@ write_secrets(){
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
   cat <<EOF >${SECRETS_FN}
-MESSAGE=ohai
+MOGUL_SERVICE_HOST=https://api.media-mogul.io
+MOGUL_GATEWAY_HOST=https://studio.media-mogul.io
+AUTHORIZATION_SERVICE_HOST=https://auth.media-mogul.io
+MOGUL_CLIENT_HOST=https://site.media-mogul.io
 RMQ_HOST=${RMQ_HOST}
 RMQ_USERNAME=${RMQ_USERNAME}
 RMQ_PASSWORD=${RMQ_PASSWORD}
@@ -39,7 +42,8 @@ PODCAST_ASSETS_S3_BUCKET=podcast-assets-bucket-dev
 PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
 PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
 PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
-IDP_ISSUER_URI=http://localhost:9090
+AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_ID=${AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_ID}
+AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_SECRET=${AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_SECRET}
 SETTINGS_PASSWORD=${SETTINGS_PASSWORD}
 SETTINGS_SALT=${SETTINGS_SALT}
 EOF
@@ -50,13 +54,13 @@ EOF
 
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
-#write_secrets
-#
-#create_ip ${MOGUL_CLIENT_IP}
-#create_ip ${AUTHORIZATION_SERVICE_IP}
-#create_ip ${MOGUL_SERVICE_IP}
+write_secrets
 
-for f in authorization-service mogul-service  ; do
+create_ip ${MOGUL_CLIENT_IP}
+create_ip ${AUTHORIZATION_SERVICE_IP}
+create_ip ${MOGUL_SERVICE_IP}
+
+for f in authorization-service mogul-service mogul-gateway  ; do
   Y=app-${f}-data.yml
   cd $ROOT_DIR/k8s/carvel/
   D=deployments/${f}-deployment
@@ -65,7 +69,4 @@ for f in authorization-service mogul-service  ; do
   echo "applying ${Y} ..."
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml > out.yml
   cat out.yml |   kubectl apply  -n $NAMESPACE_NAME -f -
-  cat out.yml
-#   | kubectl apply -f -
 done
-#kubectl apply  -n $NAMESPACE_NAME -f $ROOT_DIR/k8s
