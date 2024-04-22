@@ -78,9 +78,9 @@ get_image(){
 for f in authorization-service mogul-service mogul-gateway  ; do
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
-  OLD_IMAGE=$(kubectl get $D -o json  | jq -r '.spec.template.spec.containers.[0].image')
+  OLD_IMAGE=`get_image $D`
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f - | kubectl apply  -n $NAMESPACE_NAME -f -
-  NEW_IMAGE=$(kubectl get $D -o json  | jq -r '.spec.template.spec.containers.[0].image')
+  NEW_IMAGE=`get_image $D`
   echo "comparing container images for the first container!"
   echo $OLD_IMAGE
   echo $NEW_IMAGE
