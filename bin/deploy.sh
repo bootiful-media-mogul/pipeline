@@ -61,14 +61,10 @@ for ip in $MOGUL_GATEWAY_IP $MOGUL_CLIENT_IP $AUTHORIZATION_SERVICE_IP $MOGUL_SE
   create_ip $ip
 done
 
-#create_ip ${MOGUL_GATEWAY_IP}
-#create_ip ${MOGUL_CLIENT_IP}
-#create_ip ${AUTHORIZATION_SERVICE_IP}
-#create_ip ${MOGUL_SERVICE_IP}
+cd $ROOT_DIR/k8s/carvel/
 
 for f in authorization-service mogul-service mogul-gateway  ; do
   Y=app-${f}-data.yml
-  cd $ROOT_DIR/k8s/carvel/
   D=deployments/${f}-deployment
   echo "going to delete ${D}."
   kubectl delete -n $NAMESPACE_NAME $D || echo "could not delete deployment ${D}."
@@ -76,3 +72,6 @@ for f in authorization-service mogul-service mogul-gateway  ; do
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml > out.yml
   cat out.yml |   kubectl apply  -n $NAMESPACE_NAME -f -
 done
+
+
+cd "$GITHUB_WORKSPACE"
