@@ -14,13 +14,10 @@ spec:
       labels:
         app: #@ str(data.values.service)
     spec:
-
-
       containers:
         - name: #@ data.values.service  + '-container'
           image: #@ data.values.container
           imagePullPolicy: Always
-
           #@ if/end data.values.probes:
           livenessProbe: #@ data.values.probes.livenessProbe
           readinessProbe: #@ data.values.probes.readinessProbe
