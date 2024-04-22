@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -o pipefail
+
 export ROOT_DIR="$(cd `dirname $0` && pwd )"
 echo "The root directory is ${ROOT_DIR}."
 export NAMESPACE_NAME=mogul
