@@ -7,6 +7,7 @@ export NAMESPACE_NAME=mogul
 AUTHORIZATION_SERVICE_IP=${NAMESPACE_NAME}-authorization-service-ip
 MOGUL_CLIENT_IP=${NAMESPACE_NAME}-mogul-client-ip
 MOGUL_SERVICE_IP=${NAMESPACE_NAME}-mogul-service-ip
+MOGUL_GATEWAY_IP=${NAMESPACE_NAME}-mogul-gateway-ip
 
 create_ip(){
   ipn=$1
@@ -56,9 +57,14 @@ kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
 write_secrets
 
-create_ip ${MOGUL_CLIENT_IP}
-create_ip ${AUTHORIZATION_SERVICE_IP}
-create_ip ${MOGUL_SERVICE_IP}
+for ip in $MOGUL_GATEWAY_IP $MOGUL_CLIENT_IP $AUTHORIZATION_SERVICE_IP $MOGUL_SERVICE_IP ; do
+  create_ip $ip
+done
+
+#create_ip ${MOGUL_GATEWAY_IP}
+#create_ip ${MOGUL_CLIENT_IP}
+#create_ip ${AUTHORIZATION_SERVICE_IP}
+#create_ip ${MOGUL_SERVICE_IP}
 
 for f in authorization-service mogul-service mogul-gateway  ; do
   Y=app-${f}-data.yml
