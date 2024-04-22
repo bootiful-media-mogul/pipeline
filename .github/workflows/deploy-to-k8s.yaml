@@ -8,7 +8,6 @@ env:
   GKE_CLUSTER: joshlong
   GCLOUD_ZONE: us-east4
   NS_NAME: mogul
-  MESSAGE: "hello, Mogul Secrets"
   RMQ_HOST: ${{secrets.RMQ_HOST}}
   RMQ_USERNAME: ${{secrets.RMQ_USERNAME}}
   RMQ_PASSWORD: ${{secrets.RMQ_PASSWORD}}
@@ -27,7 +26,6 @@ env:
   PODCAST_ASSETS_S3_BUCKET_FOLDER: 062019
   PODCAST_INPUT_S3_BUCKET: podcast-input-bucket-dev
   PODCAST_OUTPUT_S3_BUCKET: podcast-output-bucket-dev
-  IDP_ISSUER_URI: http://localhost:9090
 on:
   repository_dispatch:
     types: update-event
@@ -73,9 +71,11 @@ jobs:
 
       - name: Deploy
         run: |
+          cd $GITHUB_WORKSPACE
+          export ROOT_DIR=$GITHUB_WORKSPACE
+          
           kubectl get ns/$NS_NAME || kubectl create ns $NS_NAME 
           kubectl config set-context --current --namespace=$NS_NAME
           kubectl config view --minify | grep namespace: && echo "found the namespace.."
-          cd $GITHUB_WORKSPACE
-          export ROOT_DIR=$GITHUB_WORKSPACE
+          
           ./bin/deploy.sh
