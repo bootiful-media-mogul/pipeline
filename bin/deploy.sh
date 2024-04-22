@@ -72,7 +72,18 @@ cd $ROOT_DIR/k8s/carvel/
 for f in authorization-service mogul-service mogul-gateway  ; do
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
+  OLD_IMAGE=$(kubectl get $D -o json  | jq -r '.spec.template.spec.containers.[0].image')
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f - | kubectl apply  -n $NAMESPACE_NAME -f -
+  NEW_IMAGE=$(kubectl get $D -o json  | jq -r '.spec.template.spec.containers.[0].image')
+  echo "comparing container images for the first container!"
+  echo $OLD_IMAGE
+  echo $NEW_IMAGE
+  if [ "$OLD_IMAGE" = "$NEW_IMAGE" ]; then
+    echo "no need to restart $D"
+  else
+   echo "restarting $D"
+   kubectl rollout restart $D
+  fi
 done
 
 
