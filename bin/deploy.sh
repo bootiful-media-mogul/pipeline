@@ -58,6 +58,7 @@ kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 write_secrets
 
 for ip in $MOGUL_GATEWAY_IP $MOGUL_CLIENT_IP $AUTHORIZATION_SERVICE_IP $MOGUL_SERVICE_IP ; do
+  echo "going to create ${ip}"
   create_ip $ip
 done
 
@@ -74,4 +75,4 @@ for f in authorization-service mogul-service mogul-gateway  ; do
 done
 
 
-cd "$GITHUB_WORKSPACE"
+cd "$ROOT_DIR"
