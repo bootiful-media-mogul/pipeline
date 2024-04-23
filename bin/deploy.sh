@@ -70,7 +70,7 @@ done
 cd $ROOT_DIR/k8s/carvel/
 
 get_image(){
-  kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image"
+  kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
 
 for f in authorization-service mogul-service mogul-gateway mogul-client  ; do
