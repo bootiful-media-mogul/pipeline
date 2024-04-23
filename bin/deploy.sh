@@ -70,10 +70,7 @@ done
 cd $ROOT_DIR/k8s/carvel/
 
 get_image(){
-  echo `jq --version`
-  deployment_name=$1
-  echo "going to get the image for $deployment_name"
-  kubectl get "$deployment_name" -o json  | jq -r  ".spec.template.spec.containers[0].image"
+  kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image"
 }
 
 for f in authorization-service mogul-service mogul-gateway  ; do
