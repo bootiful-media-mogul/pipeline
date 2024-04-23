@@ -73,7 +73,7 @@ get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image"
 }
 
-for f in authorization-service mogul-service mogul-gateway  ; do
+for f in authorization-service mogul-service mogul-gateway mogul-client  ; do
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
   OLD_IMAGE=`get_image $D`
