@@ -5,6 +5,9 @@ kind: Deployment
 metadata:
   name: #@ str(data.values.service) + '-deployment'
 spec:
+  strategy:
+    type: Recreate
+
   selector:
     matchLabels:
       app: #@ str(data.values.service)
