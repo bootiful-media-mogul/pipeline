@@ -79,7 +79,7 @@ for f in mogul-podcast-audio-processor authorization-service mogul-service mogul
   echo "------------------"
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
-  OLD_IMAGE=`get_image $D`
+  OLD_IMAGE=`get_image $D || NA`
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f -  > out.yml
   cat out.yml | kubectl apply  -n $NAMESPACE_NAME -f -
   NEW_IMAGE=`get_image $D`
