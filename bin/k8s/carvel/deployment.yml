@@ -16,6 +16,13 @@ spec:
     spec:
       containers:
         - name: #@ data.values.service  + '-container'
+
+          resources:
+            limits:
+              memory: "1Gi"
+            requests:
+              memory: "1Gi"
+
           image: #@ data.values.container
           imagePullPolicy: Always
           #@ if data.values.probes.livenessProbe :
@@ -70,6 +77,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: #@  'mogul-' + data.values.service +'-ip'
     networking.gke.io/managed-certificates: #@  data.values.service +'-certificate'
 spec:
+
   rules:
     - host: #@ data.values.url
       http:
