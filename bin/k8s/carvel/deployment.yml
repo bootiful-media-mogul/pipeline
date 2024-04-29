@@ -49,6 +49,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
   name: #@ data.values.service  + '-service'
 spec:
   type: NodePort
@@ -65,6 +67,7 @@ metadata:
   name: #@ data.values.service  + '-ingress'
   annotations:
     ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.allow-http: "false"
     kubernetes.io/ingress.global-static-ip-name: #@  'mogul-' + data.values.service +'-ip'
     networking.gke.io/managed-certificates: #@  data.values.service +'-certificate'
 spec:
