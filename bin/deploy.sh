@@ -90,7 +90,7 @@ for f in authorization-service mogul-service mogul-gateway mogul-client  ; do
    echo "restarting $D"
    kubectl rollout restart $D
   fi
-  echo "------------------"
+
 done
 
 
