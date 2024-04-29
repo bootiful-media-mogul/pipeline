@@ -7,8 +7,8 @@ url: ""
 port: 8080
 probes:
   readinessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 60
+    initialDelaySeconds: 20
+    periodSeconds: 20
     httpGet:
       port: 8080
       path: /actuator/health/readiness
