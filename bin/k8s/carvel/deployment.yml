@@ -18,10 +18,10 @@ spec:
         - name: #@ data.values.service  + '-container'
           image: #@ data.values.container
           imagePullPolicy: Always
-          #@ if data.values.probes.livenessProbe
+          #@ if data.values.probes.livenessProbe :
           livenessProbe: #@ data.values.probes.livenessProbe
           #@ end
-          #@ if data.values.probes.readinessProbe
+          #@ if data.values.probes.readinessProbe :
           readinessProbe: #@ data.values.probes.readinessProbe
           #@ end
           ports:
