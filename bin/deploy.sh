@@ -7,10 +7,6 @@ export ROOT_DIR="$(cd `dirname $0` && pwd )"
 echo "The root directory is ${ROOT_DIR}."
 export NAMESPACE_NAME=mogul
 
-AUTHORIZATION_SERVICE_IP=${NAMESPACE_NAME}-authorization-service-ip
-MOGUL_CLIENT_IP=${NAMESPACE_NAME}-mogul-client-ip
-MOGUL_SERVICE_IP=${NAMESPACE_NAME}-mogul-service-ip
-MOGUL_GATEWAY_IP=${NAMESPACE_NAME}-mogul-gateway-ip
 
 create_ip(){
   ipn=$1
@@ -63,11 +59,11 @@ EOF
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
 
 write_secrets
-
-for ip in $MOGUL_GATEWAY_IP $MOGUL_CLIENT_IP $AUTHORIZATION_SERVICE_IP $MOGUL_SERVICE_IP ; do
-  echo "going to create ${ip}"
-  create_ip $ip
-done
+#
+#for ip in $MOGUL_GATEWAY_IP $MOGUL_CLIENT_IP $AUTHORIZATION_SERVICE_IP $MOGUL_SERVICE_IP ; do
+#  echo "going to create ${ip}"
+#  create_ip $ip
+#done
 
 cd $ROOT_DIR/k8s/carvel/
 
@@ -76,10 +72,16 @@ get_image(){
 }
 
 for f in mogul-podcast-audio-processor authorization-service mogul-service mogul-gateway mogul-client ; do
+
   echo "------------------"
+
+  IP=${NAMESPACE_NAME}-${f}-ip
+  echo "creating IP called ${IP} "
+  create_ip $IP
+  echo "created IP called ${IP} "
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
-  OLD_IMAGE=`get_image $D || NA`
+  OLD_IMAGE=`get_image $D `
   ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f -  > out.yml
   cat out.yml | kubectl apply  -n $NAMESPACE_NAME -f -
   NEW_IMAGE=`get_image $D`
