@@ -77,7 +77,13 @@ for f in authorization-service mogul-service mogul-gateway mogul-client  ; do
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
   OLD_IMAGE=`get_image $D`
-  ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f - | kubectl apply  -n $NAMESPACE_NAME -f -
+  
+  ytt -f $Y -f "$ROOT_DIR"/k8s/carvel/data-schema.yml -f "$ROOT_DIR"/k8s/carvel/deployment.yml |  kbld -f -  > out.yml
+  
+  echo "------------------"
+  cat out.yml | kubectl apply  -n $NAMESPACE_NAME -f -
+  echo "------------------"
+
   NEW_IMAGE=`get_image $D`
   echo "comparing container images for the first container!"
   echo $OLD_IMAGE
