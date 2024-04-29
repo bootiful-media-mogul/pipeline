@@ -21,6 +21,7 @@ create_ip(){
   fi
 }
 
+
 write_secrets(){
   export SECRETS=${NAMESPACE_NAME}-secrets
   SECRETS_FN=$HOME/${SECRETS}
