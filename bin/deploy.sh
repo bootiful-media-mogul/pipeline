@@ -75,7 +75,7 @@ get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
 
-for f in authorization-service mogul-service mogul-gateway mogul-client  ; do
+for f in mogul-podcast-audio-processor authorization-service mogul-service mogul-gateway mogul-client ; do
   echo "------------------"
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment

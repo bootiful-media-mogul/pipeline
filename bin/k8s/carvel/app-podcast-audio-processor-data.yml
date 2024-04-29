@@ -1,0 +1,20 @@
+#@data/values
+
+---
+service: mogul-podcast-audio-processor
+url: podcast-audio-processor.media-mogul.io
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-podcast-audio-processor:latest
+port: 7070
+probes:
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    httpGet:
+      port: 7070
+      path: /
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    httpGet:
+      port: 7070
+      path: /
