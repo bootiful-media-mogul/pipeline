@@ -16,13 +16,6 @@ spec:
     spec:
       containers:
         - name: #@ data.values.service  + '-container'
-
-          resources:
-            limits:
-              memory: "1Gi"
-            requests:
-              memory: "1Gi"
-
           image: #@ data.values.container
           imagePullPolicy: Always
           #@ if data.values.probes.livenessProbe :
