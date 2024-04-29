@@ -5,20 +5,12 @@ service: mogul-gateway
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-gateway:latest
 url: studio.media-mogul.io
 port: 8080
+
 probes:
-
   readinessProbe:
-    exec:
-      command:
-      - /bin/sh
-      - -c
-      - exit 0
-    initialDelaySeconds: 5
-    periodSeconds: 5
-
+    httpGet:
+      path: /actuator/health/readiness
   livenessProbe:
-    exec:
-      command:
-      - /bin/sh
-      - -c
-      - exit 0
+    httpGet:
+      path: /actuator/health/liveness
+
