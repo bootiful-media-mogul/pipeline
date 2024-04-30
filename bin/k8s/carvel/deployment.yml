@@ -5,7 +5,7 @@ kind: Deployment
 metadata:
   name: #@ str(data.values.service) + '-deployment'
 spec:
-
+  replicas: 1
   selector:
     matchLabels:
       app: #@ str(data.values.service)
@@ -49,8 +49,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    cloud.google.com/neg: '{"ingress": true}'
   name: #@ data.values.service  + '-service'
 spec:
   type: NodePort
