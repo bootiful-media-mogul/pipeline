@@ -5,11 +5,3 @@ service: mogul-service
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
 url: api.media-mogul.io
 port: 8080
-probes:
-  readinessProbe:
-    httpGet:
-      path: /actuator/health/readiness
-  livenessProbe:
-    httpGet:
-      path: /actuator/health/liveness
-

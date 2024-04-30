@@ -7,14 +7,10 @@ container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-podcast-audi
 port: 7070
 probes:
   readinessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 60
     httpGet:
       port: 7070
       path: /
   livenessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 60
     httpGet:
       port: 7070
       path: /
