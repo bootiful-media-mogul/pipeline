@@ -1,8 +1,6 @@
 name: Deploy
 
 env:
-
-#  GKE_CLUSTER: joshlong
   GCLOUD_SA_KEY:  ${{ secrets.GCLOUD_SA_KEY }}
   GH_PAT: ${{ secrets.MOGUL_GITHUB_PERSONAL_ACCESS_TOKEN }}
   GCLOUD_PROJECT: joshlong
