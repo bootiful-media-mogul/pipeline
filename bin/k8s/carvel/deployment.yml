@@ -16,6 +16,8 @@ spec:
     spec:
       containers:
         - name: #@ data.values.service  + '-container'
+
+
           image: #@ data.values.container
           imagePullPolicy: Always
           #@ if data.values.probes.livenessProbe :
@@ -24,6 +26,13 @@ spec:
           #@ if data.values.probes.readinessProbe :
           readinessProbe: #@ data.values.probes.readinessProbe
           #@ end
+
+          resources:
+            limits:
+              memory: "1Gi"
+            requests:
+              memory: "1Gi"
+
           ports:
             - containerPort:  #@ data.values.port
           envFrom:
