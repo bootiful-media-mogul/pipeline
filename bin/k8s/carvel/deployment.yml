@@ -29,9 +29,13 @@ spec:
 
           resources:
             limits:
-              memory: "2Gi"
+              #@ if data.values.resources.limits.memory:
+              memory: #@ data.values.resources.limits.memory
+              #@ end
             requests:
-              memory: "2Gi"
+              #@ if data.values.resources.requests.memory:
+              memory: #@ data.values.resources.requests.memory
+              #@ end
 
           ports:
             - containerPort:  #@ data.values.port

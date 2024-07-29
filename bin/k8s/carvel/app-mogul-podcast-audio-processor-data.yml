@@ -5,6 +5,11 @@ service: mogul-podcast-audio-processor
 url: podcast-audio-processor.media-mogul.io
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-podcast-audio-processor:latest
 port: 7070
+resources:
+  limits:
+    memory: "10Gi"
+  requests:
+    memory: "10Gi"
 probes:
   readinessProbe:
     httpGet:
