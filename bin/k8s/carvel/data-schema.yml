@@ -6,10 +6,14 @@ container: ""
 url: ""
 port: 8080
 resources:
+
   limits:
+    cpu: "1000m"
     memory: "2Gi"
+
   requests:
     memory: "2Gi"
+    cpu: "1000m"
 
 probes:
   readinessProbe:
