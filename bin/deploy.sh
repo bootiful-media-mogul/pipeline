@@ -46,15 +46,13 @@ PODCAST_ASSETS_S3_BUCKET=podcast-assets-bucket-dev
 PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
 PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
 PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
-AUTHORIZATION_SERVICE_USERS_JLONG_USERNAME=${AUTHORIZATION_SERVICE_USERS_JLONG_USERNAME}
-AUTHORIZATION_SERVICE_USERS_JLONG_PASSWORD=${AUTHORIZATION_SERVICE_USERS_JLONG_PASSWORD}
-AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_ID=${AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_ID}
-AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_SECRET=${AUTHORIZATION_SERVICE_CLIENTS_MOGUL_CLIENT_SECRET}
 SETTINGS_PASSWORD=${SETTINGS_PASSWORD}
 SETTINGS_SALT=${SETTINGS_SALT}
+AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+AUTH0_DOMAIN=${AUTH0_DOMAIN}
 DEBUG=true
 EOF
-# put DEBUG=true in secret above to enable a lot of logging.
 
   kubectl delete secrets -n $NAMESPACE_NAME $SECRETS || echo "no secrets to delete."
   kubectl create secret generic $SECRETS -n $NAMESPACE_NAME --from-env-file $SECRETS_FN
@@ -70,7 +68,7 @@ get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
 
-for f in mogul-podcast-audio-processor authorization-service mogul-service mogul-gateway mogul-client ; do
+for f in mogul-podcast-audio-processor mogul-service mogul-gateway mogul-client ; do
 
   echo "------------------"
 
