@@ -88,7 +88,7 @@ get_image(){
 # there are somethings we need to deploy just once...
 
 # The google cloud sql auth proxy situation is a nightmare.
-kubectl apply -n $NAMESPACE_NAME -f "$ROOT_DIR"/k8s/carvel/google-cloud-sql-auth-proxy-deployment.yml
+#kubectl apply -n $NAMESPACE_NAME -f "$ROOT_DIR"/k8s/carvel/google-cloud-sql-auth-proxy-deployment.yml
 
 
 # MAIN APPS
