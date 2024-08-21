@@ -2,10 +2,11 @@ name: Deploy
 
 env:
   GCLOUD_SA_KEY:  ${{ secrets.GCLOUD_SA_KEY }}
-  GH_PAT: ${{ secrets.MOGUL_GITHUB_PERSONAL_ACCESS_TOKEN }}
+  GCLOUD_SQL_SA_KEY: ${{secrets.GCLOUD_SQL_SA_KEY}}
   GCLOUD_PROJECT: joshlong
-  GKE_CLUSTER: joshlong
   GCLOUD_ZONE: us-east4
+  GH_PAT: ${{ secrets.MOGUL_GITHUB_PERSONAL_ACCESS_TOKEN }}
+  GKE_CLUSTER: joshlong
   NS_NAME: mogul
   RMQ_HOST: ${{secrets.RMQ_HOST}}
   RMQ_USERNAME: ${{secrets.RMQ_USERNAME}}

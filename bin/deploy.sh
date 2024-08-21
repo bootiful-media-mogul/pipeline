@@ -22,12 +22,14 @@ write_secrets(){
   export SECRETS=${NAMESPACE_NAME}-secrets
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
+
+  # no longer required but keeping for posterity.
+  # SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER=https://auth.media-mogul.io
   cat <<EOF >${SECRETS_FN}
 MOGUL_SERVICE_HOST=https://api.media-mogul.io
 MOGUL_GATEWAY_HOST=https://studio.media-mogul.io
 AUTHORIZATION_SERVICE_HOST=https://auth.media-mogul.io
 MOGUL_CLIENT_HOST=https://ui.media-mogul.io
-SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER=https://auth.media-mogul.io
 RMQ_HOST=${RMQ_HOST}
 RMQ_USERNAME=${RMQ_USERNAME}
 RMQ_PASSWORD=${RMQ_PASSWORD}
@@ -56,6 +58,20 @@ EOF
 
   kubectl delete secrets -n $NAMESPACE_NAME $SECRETS || echo "no secrets to delete."
   kubectl create secret generic $SECRETS -n $NAMESPACE_NAME --from-env-file $SECRETS_FN
+
+  ##
+  ## need to give a service account .json file to run
+  ## the google cloud sql proxy auth container
+  ##
+  export SQL_SECRETS=${NAMESPACE_NAME}-sql-secrets
+  export SQL_SECRETS_FN=${HOME}/${SQL_SECRETS}
+  mkdir -p "`dirname $SQL_SECRETS_FN`"
+  rm -f $SQL_SECRETS_FN
+  echo $GCLOUD_SQL_SA_KEY  | base64 -d > $SQL_SECRETS_FN
+  cat $SQL_SECRETS_FN
+  # ok but how do i get the file to this place?
+  kubectl get secrets/${SQL_SECRETS} ||  \
+    kubectl create secret generic $SQL_SECRETS -n $NAMESPACE_NAME --from-file=service_account.json=$SQL_SECRETS_FN
 }
 
 kubectl get ns $NAMESPACE_NAME || kubectl create namespace $NAMESPACE_NAME
@@ -68,6 +84,15 @@ get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
 
+# INFRASTRUCTURE
+# there are somethings we need to deploy just once...
+
+# The google cloud sql auth proxy situation is a nightmare.
+kubectl apply -n $NAMESPACE_NAME -f "$ROOT_DIR"/k8s/carvel/google-cloud-sql-auth-proxy-deployment.yml
+
+
+# MAIN APPS
+# and there are a bunch of apps we needs to deploy and they all share a similar setup
 for f in mogul-podcast-audio-processor mogul-service mogul-gateway mogul-client ; do
 
   echo "------------------"
