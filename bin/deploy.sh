@@ -24,7 +24,6 @@ write_secrets(){
   mkdir -p "`dirname $SECRETS_FN`"
 
   # no longer required but keeping for posterity.
-  # SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER=https://auth.media-mogul.io
   cat <<EOF >${SECRETS_FN}
 MOGUL_SERVICE_HOST=https://api.media-mogul.io
 MOGUL_GATEWAY_HOST=https://studio.media-mogul.io
@@ -83,13 +82,6 @@ cd $ROOT_DIR/k8s/carvel/
 get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
-
-# INFRASTRUCTURE
-# there are somethings we need to deploy just once...
-
-# The google cloud sql auth proxy situation is a nightmare.
-#kubectl apply -n $NAMESPACE_NAME -f "$ROOT_DIR"/k8s/carvel/google-cloud-sql-auth-proxy-deployment.yml
-
 
 # MAIN APPS
 # and there are a bunch of apps we needs to deploy and they all share a similar setup
