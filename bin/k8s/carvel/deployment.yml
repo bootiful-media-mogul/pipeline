@@ -31,8 +31,6 @@ spec:
 
           resources:
             limits:
-#              Pod ephemeral local storage usage exceeds the total limit of containers 1Gi
-              ephemeral-storage: "5Gi"
               
               #@ if data.values.resources.limits.cpu:
               cpu : #@ data.values.resources.limits.cpu
