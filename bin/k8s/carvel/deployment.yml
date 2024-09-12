@@ -40,9 +40,6 @@ spec:
               memory: #@ data.values.resources.limits.memory
               #@ end
 
-              #@ if data.values.resources.limits.ephemeral-storage:
-              ephemeral-storage: #@ data.values.resources.limits.ephemeral-storage
-              #@ end
 
 
             requests:
