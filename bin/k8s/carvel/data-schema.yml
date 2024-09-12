@@ -10,10 +10,10 @@ resources:
   limits:
     cpu: "1000m"
     memory: "2Gi"
-
   requests:
     memory: "2Gi"
     cpu: "1000m"
+    ephemeral-storage: "10Gi"
 
 probes:
   readinessProbe:
