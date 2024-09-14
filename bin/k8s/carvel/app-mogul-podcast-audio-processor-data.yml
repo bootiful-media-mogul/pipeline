@@ -11,7 +11,7 @@ resources:
     memory: "10Gi"
   requests:
     cpu: "1000m"
-    ephemeral-storage: "5Gi"
+    ephemeral-storage: "10Gi"
     memory: "10Gi"
 probes:
   readinessProbe:

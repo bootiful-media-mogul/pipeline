@@ -32,6 +32,10 @@ spec:
           resources:
             limits:
               
+              #@ if data.values.resources.limits['ephemeral-storage'] :
+              ephemeral-storage: #@  data.values.resources.limits['ephemeral-storage']
+              #@ end
+              
               #@ if data.values.resources.limits.cpu:
               cpu : #@ data.values.resources.limits.cpu
               #@ end
