@@ -85,8 +85,8 @@ get_image(){
 
 # MAIN APPS
 # and there are a bunch of apps we needs to deploy and they all share a similar setup
-for f in mogul-podcast-audio-processor mogul-service mogul-gateway mogul-client ; do
-
+for f in mogul-service mogul-gateway mogul-client ; do
+  
   echo "------------------"
 
   IP=${NAMESPACE_NAME}-${f}-ip
