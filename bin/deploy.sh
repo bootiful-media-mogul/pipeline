@@ -23,6 +23,14 @@ write_secrets(){
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
 
+# old 
+# PODCAST_ASSETS_S3_BUCKET=podcast-assets-bucket-dev
+# PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
+# PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
+# PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
+# PODCASTS_PROCESSOR_RMQ_REQUESTS=podcast-processor-requests
+# PODCASTS_PROCESSOR_RMQ_REPLIES=podcast-processor-replies
+
   # no longer required but keeping for posterity.
   cat <<EOF >${SECRETS_FN}
 MOGUL_SERVICE_HOST=https://api.media-mogul.io
@@ -41,17 +49,12 @@ OPENAI_KEY=${OPENAI_KEY}
 AWS_REGION=${AWS_REGION}
 AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 AWS_ACCESS_KEY_SECRET=${AWS_ACCESS_KEY_SECRET}
-PODCASTS_PROCESSOR_RMQ_REQUESTS=podcast-processor-requests
-PODCASTS_PROCESSOR_RMQ_REPLIES=podcast-processor-replies
-PODCAST_ASSETS_S3_BUCKET=podcast-assets-bucket-dev
-PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
-PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
-PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
 SETTINGS_PASSWORD=${SETTINGS_PASSWORD}
 SETTINGS_SALT=${SETTINGS_SALT}
 AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
 AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
 AUTH0_DOMAIN=${AUTH0_DOMAIN}
+MOGUL_MANAGED_FILES_S3_BUCKET=mogul-managedfiles
 DEBUG=true
 EOF
 
