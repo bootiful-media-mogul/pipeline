@@ -18,12 +18,22 @@ resources:
     ephemeral-storage: "10Gi"
 
 probes:
-  readinessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 60
+
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 30
     httpGet:
       port: 8080
       path: /actuator/health/readiness
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 60
+    failureThreshold: 15
+    httpGet:
+      port: 8080
+      path: /actuator/health/readiness
+
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 60
