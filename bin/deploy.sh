@@ -57,9 +57,8 @@ AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
 AUTH0_DOMAIN=${AUTH0_DOMAIN}
 MOGUL_MANAGED_FILES_S3_BUCKET=mogul-managedfiles
 MOGUL_AWS_CLOUDFRONT_DOMAIN=https://d3qy1h6z3g7kc1.cloudfront.net
-DEBUG=true
 EOF
-
+# DEBUG=true
   kubectl delete secrets -n $NAMESPACE_NAME $SECRETS || echo "no secrets to delete."
   kubectl create secret generic $SECRETS -n $NAMESPACE_NAME --from-env-file $SECRETS_FN
 
