@@ -23,14 +23,6 @@ write_secrets(){
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
 
-# old 
-# PODCAST_ASSETS_S3_BUCKET=podcast-assets-bucket-dev
-# PODCAST_ASSETS_S3_BUCKET_FOLDER=062019
-# PODCAST_INPUT_S3_BUCKET=podcast-input-bucket-dev
-# PODCAST_OUTPUT_S3_BUCKET=podcast-output-bucket-dev
-# PODCASTS_PROCESSOR_RMQ_REQUESTS=podcast-processor-requests
-# PODCASTS_PROCESSOR_RMQ_REPLIES=podcast-processor-replies
-
   # no longer required but keeping for posterity.
   cat <<EOF >${SECRETS_FN}
 MOGUL_SERVICE_HOST=https://api.media-mogul.io
