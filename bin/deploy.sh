@@ -23,6 +23,7 @@ write_secrets(){
   SECRETS_FN=$HOME/${SECRETS}
   mkdir -p "`dirname $SECRETS_FN`"
 
+
   # no longer required but keeping for posterity.
   cat <<EOF >${SECRETS_FN}
 MOGUL_SERVICE_HOST=https://api.mogul.tools
