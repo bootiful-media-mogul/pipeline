@@ -25,10 +25,10 @@ write_secrets(){
 
   # no longer required but keeping for posterity.
   cat <<EOF >${SECRETS_FN}
-MOGUL_SERVICE_HOST=https://api.media-mogul.io
-MOGUL_GATEWAY_HOST=https://studio.media-mogul.io
-AUTHORIZATION_SERVICE_HOST=https://auth.media-mogul.io
-MOGUL_CLIENT_HOST=https://ui.media-mogul.io
+MOGUL_SERVICE_HOST=https://api.mogul.tools
+MOGUL_GATEWAY_HOST=https://studio.mogul.tools
+AUTHORIZATION_SERVICE_HOST=https://auth.mogul.tools
+MOGUL_CLIENT_HOST=https://ui.mogul.tools
 RMQ_HOST=${RMQ_HOST}
 RMQ_USERNAME=${RMQ_USERNAME}
 RMQ_PASSWORD=${RMQ_PASSWORD}
