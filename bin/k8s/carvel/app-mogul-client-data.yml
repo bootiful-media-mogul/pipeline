@@ -3,7 +3,7 @@
 ---
 service: mogul-client
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-client:latest
-url: ui.media-mogul.io
+url: ui.mogul.tools
 port: 8080
 
 

@@ -3,5 +3,5 @@
 ---
 service: authorization-service
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
-url: auth.media-mogul.io
+url: auth.mogul.tools
 port: 8080

@@ -3,7 +3,7 @@
 ---
 service: mogul-service
 container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
-url: api.media-mogul.io
+url: api.mogul.tools
 port: 8080
 resources:
   limits:
