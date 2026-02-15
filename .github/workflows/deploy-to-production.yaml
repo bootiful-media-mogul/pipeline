@@ -33,6 +33,8 @@ env:
   AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
   AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
   AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+  WP_CLIENT_ID: ${{ secrets.WP_CLIENT_ID }}
+  WP_CLIENT_SECRET: ${{ secrets.WP_CLIENT_SECRET }}
 
 on:
   repository_dispatch:
