@@ -69,6 +69,14 @@ spec:
               value:  #@ str(data.values.port)
             - name: LANG
               value: "en_US.UTF-8"
+            # every timestamp column in the database is a timestamptz, and the
+            # PostgreSQL JDBC driver issues a `SET TimeZone` to the JVM's default on
+            # every connection -- so the container's zone decides how the application
+            # reads and writes time. it is UTC today only because the base image says
+            # so; this makes it deliberate, and keeps logs and anything non-Java in the
+            # container on the same clock.
+            - name: TZ
+              value: "UTC"
 
 
 ---
