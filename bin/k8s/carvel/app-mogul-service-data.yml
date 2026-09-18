@@ -8,9 +8,13 @@ port: 8080
 replicas: 1
 resources:
   limits:
-    cpu: "1000m"
-    memory: "10Gi"
+    #! 1539m is what Autopilot derived from the old 10Gi memory request via its
+    #! 6.5:1 memory:CPU ceiling. the 3Gi request no longer forces it, so we ask
+    #! for it outright: limits == requests under Autopilot (Guaranteed QoS), so
+    #! this is a hard cap, and ffmpeg decode speed rides on it.
+    cpu: "1539m"
+    memory: "3Gi"
   requests:
-    cpu: "1000m"
+    cpu: "1539m"
     ephemeral-storage: "10Gi"
-    memory: "10Gi"
+    memory: "3Gi"
