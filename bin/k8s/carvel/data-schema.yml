@@ -5,6 +5,7 @@ service: ""
 container: ""
 url: ""
 port: 8080
+replicas: 1
 resources:
 
   limits:

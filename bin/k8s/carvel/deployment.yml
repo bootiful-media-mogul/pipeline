@@ -5,7 +5,7 @@ kind: Deployment
 metadata:
   name: #@ str(data.values.service) + '-deployment'
 spec:
-  replicas: 1
+  replicas: #@ data.values.replicas
   selector:
     matchLabels:
       app: #@ str(data.values.service)
