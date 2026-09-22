@@ -1,7 +1,0 @@
-#@data/values
-
----
-service: authorization-service
-container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/authorization-service:latest
-url: auth.mogul.tools
-port: 8080

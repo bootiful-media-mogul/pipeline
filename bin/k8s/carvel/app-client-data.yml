@@ -1,0 +1,9 @@
+#@data/values
+
+---
+service: client
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/client:latest
+url: ui.mogul.tools
+port: 8080
+
+

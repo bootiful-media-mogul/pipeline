@@ -1,0 +1,9 @@
+#@data/values
+
+---
+service: gateway
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/gateway:latest
+url: studio.mogul.tools
+port: 8080
+
+

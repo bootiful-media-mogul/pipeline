@@ -1,8 +1,8 @@
 #@data/values
 
 ---
-service: mogul-service
-container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/mogul-service:latest
+service: api
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/api:latest
 url: api.mogul.tools
 port: 8080
 replicas: 1
