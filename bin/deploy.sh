@@ -88,10 +88,8 @@ get_image(){
 
 # MAIN APPS
 # and there are a bunch of apps we needs to deploy and they all share a similar setup
-for f in mogul-service mogul-gateway mogul-client ; do
-  
+for f in api gateway client ; do
   echo "------------------"
-
   IP=${NAMESPACE_NAME}-${f}-ip
   echo "creating IP called ${IP} "
   create_ip $IP
