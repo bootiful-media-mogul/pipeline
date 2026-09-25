@@ -6,6 +6,10 @@ container: ""
 url: ""
 port: 8080
 replicas: 1
+#! true  -> the app is a web app: emit a Service, Ingress, ManagedCertificate and
+#!          BackendConfig, publish a containerPort, and health-check it over HTTP.
+#! false -> the app is a headless back-office worker: a Deployment and nothing else.
+expose: true
 resources:
 
   limits:

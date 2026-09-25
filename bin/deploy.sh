@@ -86,14 +86,25 @@ get_image(){
   kubectl get "$1" -o json  | jq -r  ".spec.template.spec.containers[0].image" || echo "no old version to compare against"
 }
 
+# an app is exposed unless its data file says otherwise. headless back-office workers
+# (processors) render to a bare Deployment: no Service, no Ingress, and so no static IP
+# and no managed certificate to reserve for them.
+is_exposed(){
+  ! grep -qE '^[[:space:]]*expose:[[:space:]]*false' "app-${1}-data.yml"
+}
+
 # MAIN APPS
 # and there are a bunch of apps we needs to deploy and they all share a similar setup
-for f in api gateway client ; do
+for f in api gateway client processors ; do
   echo "------------------"
-  IP=${NAMESPACE_NAME}-${f}-ip
-  echo "creating IP called ${IP} "
-  create_ip $IP
-  echo "created IP called ${IP} "
+  if is_exposed "$f" ; then
+    IP=${NAMESPACE_NAME}-${f}-ip
+    echo "creating IP called ${IP} "
+    create_ip $IP
+    echo "created IP called ${IP} "
+  else
+    echo "${f} is headless; skipping the static IP."
+  fi
   Y=app-${f}-data.yml
   D=deployments/${f}-deployment
   OLD_IMAGE=`get_image $D `

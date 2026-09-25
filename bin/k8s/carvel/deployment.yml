@@ -22,12 +22,19 @@ spec:
           image: #@ data.values.container
           imagePullPolicy: Always
 
+          #! the probes are all httpGet against the actuator, so they only apply to an
+          #! exposed app. a headless worker has no endpoint to probe: kubernetes falls
+          #! back to the process being alive, which is the correct signal for it anyway.
+          #@ if data.values.expose:
+
           #@ if data.values.probes.livenessProbe :
           livenessProbe: #@ data.values.probes.livenessProbe
           #@ end
 
           #@ if data.values.probes.readinessProbe :
           readinessProbe: #@ data.values.probes.readinessProbe
+          #@ end
+
           #@ end
 
           resources:
@@ -59,20 +66,25 @@ spec:
               memory: #@ data.values.resources.requests.memory
               #@ end
 
+          #@ if data.values.expose:
           ports:
             - containerPort:  #@ data.values.port
+          #@ end
           envFrom:
             - secretRef:
                 name: mogul-secrets
           env:
+            #@ if data.values.expose:
             - name: SERVER_PORT
               value:  #@ str(data.values.port)
+            #@ end
             - name: LANG
               value: "en_US.UTF-8"
             - name: TZ
               value: "UTC"
 
 
+#@ if data.values.expose:
 ---
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
@@ -137,3 +149,4 @@ spec:
                 name:  #@ data.values.service + '-service'
                 port:
                   number:  #@ data.values.port
+#@ end

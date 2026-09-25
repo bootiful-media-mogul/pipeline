@@ -1,0 +1,26 @@
+#@data/values
+
+---
+service: processors
+container: us-docker.pkg.dev/joshlong/mogul-artifact-registry/processors:latest
+
+expose: false
+
+resources:
+  limits:
+    cpu: "1750m"
+    memory: "3Gi"
+    ephemeral-storage: "15Gi"
+  requests:
+    cpu: "1750m"
+    memory: "3Gi"
+    ephemeral-storage: "15Gi"
+
+#resources:
+#  limits:
+#    cpu: "1539m"
+#    memory: "3Gi"
+#  requests:
+#    cpu: "1539m"
+#    memory: "3Gi"
+#    ephemeral-storage: "15Gi"
