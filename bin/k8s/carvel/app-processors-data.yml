@@ -10,17 +10,7 @@ resources:
   limits:
     cpu: "1750m"
     memory: "3Gi"
-    ephemeral-storage: "15Gi"
   requests:
     cpu: "1750m"
     memory: "3Gi"
-    ephemeral-storage: "15Gi"
-
-#!resources:
-#!  limits:
-#!    cpu: "1539m"
-#!    memory: "3Gi"
-#!  requests:
-#!    cpu: "1539m"
-#!    memory: "3Gi"
-#!    ephemeral-storage: "15Gi"
+    ephemeral-storage: "10Gi"
