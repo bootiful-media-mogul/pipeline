@@ -5,7 +5,9 @@ kind: Deployment
 metadata:
   name: #@ str(data.values.service) + '-deployment'
 spec:
+  #@ if not data.values.scaling.enabled:
   replicas: #@ data.values.replicas
+  #@ end
   selector:
     matchLabels:
       app: #@ str(data.values.service)
@@ -15,6 +17,13 @@ spec:
         app: #@ str(data.values.service)
     spec:
       shareProcessNamespace: true
+
+      #! a pod picked for scale-down is not necessarily an idle one, so give JobRunr room
+      #! to finish what it is holding. anything that outlives this is not lost: the job
+      #! stops being heartbeated, another node declares it orphaned after
+      #! poll-interval x server-timeout-poll-interval-multiplicand, and it is retried.
+      terminationGracePeriodSeconds: #@ data.values.terminationGracePeriodSeconds
+
       containers:
         - name: #@ data.values.service  + '-container'
 
@@ -149,4 +158,66 @@ spec:
                 name:  #@ data.values.service + '-service'
                 port:
                   number:  #@ data.values.port
+#@ end
+
+
+#@ if data.values.scaling.enabled:
+---
+#! the database this reads is the one the app itself is given, so the credentials are the
+#! ones already in mogul-secrets. note that KEDA's operator connects from its own
+#! namespace: DB_HOST has to be reachable from there too, not only from this pod.
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: #@ data.values.service + '-jobrunr-trigger-auth'
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: mogul-secrets
+      key: DB_HOST
+    - parameter: dbName
+      name: mogul-secrets
+      key: DB_SCHEMA
+    - parameter: userName
+      name: mogul-secrets
+      key: DB_USERNAME
+    - parameter: password
+      name: mogul-secrets
+      key: DB_PASSWORD
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: #@ data.values.service + '-scaled-object'
+spec:
+  scaleTargetRef:
+    name: #@ data.values.service + '-deployment'
+  minReplicaCount: #@ data.values.scaling.minReplicas
+  maxReplicaCount: #@ data.values.scaling.maxReplicas
+  #! the query is a count of two indexed columns; every 30s is nothing.
+  pollingInterval: 30
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          #! media jobs run for minutes and a render thrown away is a render paid for
+          #! twice, so come down slowly: one pod at a time, and only once the work has
+          #! stayed gone for ten minutes.
+          stabilizationWindowSeconds: 600
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 300
+  triggers:
+    - type: postgresql
+      authenticationRef:
+        name: #@ data.values.service + '-jobrunr-trigger-auth'
+      metadata:
+        port: "5432"
+        sslmode: prefer
+        targetQueryValue: #@ str(data.values.scaling.workPerReplica)
+        #! the whole query is a deployment name against a view. the view already answers 0
+        #! for an idle module (api's V47), so there is nothing defensive to do here.
+        query: #@ "select depth from jobrunr_jobs_by_module where module = '" + data.values.service + "'"
 #@ end

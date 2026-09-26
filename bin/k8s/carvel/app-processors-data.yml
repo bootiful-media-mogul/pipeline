@@ -8,9 +8,39 @@ expose: false
 
 resources:
   limits:
-    cpu: "1750m"
-    memory: "3Gi"
+    #! one core per JobRunr worker. jobrunr.background-job-server.worker-count is 4,
+    #! and every one of those workers can be holding an ffmpeg or magick fork, so at
+    #! 1750m four of them were contending for under two cores -- which is its own
+    #! reason renders and transcriptions felt slow. raise this and worker-count
+    #! together; they describe the same thing from two sides.
+    cpu: "4000m"
+    #! 1:1 with the cpu, which is the floor Autopilot allows. the forks are tens of
+    #! megabytes apiece and the heap holds job state and transcript text, so this is
+    #! sized by the ratio rule rather than by appetite.
+    memory: "4Gi"
   requests:
-    cpu: "1750m"
-    memory: "3Gi"
+    cpu: "4000m"
+    memory: "4Gi"
+    #! the real ceiling on this pod, and already at the maximum the general-purpose
+    #! compute class allows -- which is why worker-count should not go far past 4
+    #! while production is in the mix. production expands its inputs to uncompressed
+    #! 48kHz stereo wav, about 690MB per hour of audio, and holds both the segments
+    #! and the joined result at once: call it 1.4GB per hour of episode, per job.
+    #! four concurrent hour-long episodes fit; four concurrent three-hour episodes do
+    #! not, and neither would four concurrent normalizations of 3GB source uploads.
     ephemeral-storage: "10Gi"
+
+#! a scaled-down pod is not necessarily an idle one, so JobRunr gets four minutes to
+#! finish what it is holding (interrupt-jobs-await-duration-on-stop) and the kubelet
+#! waits five before SIGKILL. the two have to stay in that order.
+terminationGracePeriodSeconds: 300
+
+#! KEDA watches how much of *our* work is waiting or running in the shared jobrunr
+#! tables -- 'our' being the jobrunr_jobs_by_module row whose module is this service.
+#! workPerReplica is jobrunr.background-job-server.worker-count: 1-4 items in flight is
+#! one pod, 5-8 is two, 9 or more is three.
+scaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  workPerReplica: 4

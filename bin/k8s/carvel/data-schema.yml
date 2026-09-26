@@ -10,6 +10,34 @@ replicas: 1
 #!          BackendConfig, publish a containerPort, and health-check it over HTTP.
 #! false -> the app is a headless back-office worker: a Deployment and nothing else.
 expose: true
+
+#! how long the kubelet waits after SIGTERM before SIGKILL. it has to exceed
+#! jobrunr.background-job-server.interrupt-jobs-await-duration-on-stop, or the pod is
+#! killed while JobRunr is still waiting politely for its own workers.
+terminationGracePeriodSeconds: 30
+
+#! KEDA. off by default: an app that doesn't ask for it keeps its fixed `replicas`.
+scaling:
+
+  #! when this is on, `replicas` is not emitted at all -- the HPA KEDA creates owns the
+  #! count, and re-applying a manifest that names replicas would reset it on every deploy.
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+
+  #! how much queued-or-running work one pod is expected to absorb. keep it equal to
+  #! jobrunr.background-job-server.worker-count: that is how many jobs a pod can actually
+  #! hold at once, and the two numbers describe the same thing from opposite ends. the
+  #! HPA wants ceil(work / this) replicas, so at 4 a single job does not summon a second
+  #! four-core pod.
+  workPerReplica: 4
+
+  #! nothing here names a java class. the depth comes from the jobrunr_jobs_by_module view
+  #! (api's V47), which buckets jobs by the `mogul.<module>` in their signature -- and that
+  #! module is this app's `service`. so the only thing this depends on is a package root
+  #! matching a deployment name, both of which are already true and neither of which moves
+  #! when a handler is renamed.
+
 resources:
 
   limits:
