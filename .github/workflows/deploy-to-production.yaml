@@ -35,6 +35,9 @@ env:
   AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
   WP_CLIENT_ID: ${{ secrets.WP_CLIENT_ID }}
   WP_CLIENT_SECRET: ${{ secrets.WP_CLIENT_SECRET }}
+  REDIS_HOST: ${{ secrets.REDIS_HOST }}
+  REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
 
 on:
   repository_dispatch:
