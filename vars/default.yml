@@ -1,0 +1,21 @@
+# the names and hosts of mogul on the default foundation (cf/.env, api.cf.mogul.pub).
+# no secrets here: bin/deploy.sh adds those from the environment.
+
+# where the apps go. bin/deploy.sh targets these itself.
+org: mogul
+space: production
+
+registry: us-docker.pkg.dev/joshlong/mogul-artifact-registry
+domain: apps.mogul.pub
+gateway-host: studio
+client-host: ui
+api-host: api
+
+# where the apps find each other. the gateway proxies to these, the same way production's does.
+MOGUL_SERVICE_HOST: https://api.apps.mogul.pub
+MOGUL_GATEWAY_HOST: https://studio.apps.mogul.pub
+MOGUL_CLIENT_HOST: https://ui.apps.mogul.pub
+MOGUL_FEEDS_NAMESPACE: http://api.apps.mogul.pub
+
+MOGUL_MANAGED_FILES_S3_BUCKET: mogul-managedfiles
+MOGUL_AWS_CLOUDFRONT_DOMAIN: https://d3qy1h6z3g7kc1.cloudfront.net
