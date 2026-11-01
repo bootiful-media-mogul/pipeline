@@ -23,7 +23,8 @@ ALL_APPS=($(awk '/^  - name:/ {print $3}' "$ROOT_DIR/manifest.yml"))
 [ ${#APPS[@]} -gt 0 ] || APPS=("${ALL_APPS[@]}")
 
 # the same secrets every pod on GKE gets from mogul-secrets. they come from the environment
-# (workspace/bin/env.sh, or bin/env-from-gke.sh) and only ever reach a temporary vars file.
+# (bin/env-from-gke.sh) and only ever reach a temporary vars file. not workspace/bin/env.sh:
+# that is the local development environment, with localhost for the database and rabbitmq.
 SECRETS="ABLY_KEY AUTH0_CLIENT_ID AUTH0_CLIENT_SECRET AUTH0_DOMAIN AWS_ACCESS_KEY_ID
   AWS_ACCESS_KEY_SECRET AWS_REGION DB_HOST DB_PASSWORD DB_SCHEMA DB_USERNAME
   ELASTICSEARCH_API_HOST ELASTICSEARCH_API_KEY ELASTICSEARCH_OTEL_HEADER ELASTICSEARCH_OTEL_HOST
@@ -36,17 +37,20 @@ for s in $SECRETS; do
 done
 if [ -n "$missing" ]; then
   echo "these are not set:$missing" >&2
-  echo "load them first: source bin/env-from-gke.sh (or workspace/bin/env.sh)" >&2
+  echo "load them first: source bin/env-from-gke.sh" >&2
   exit 1
 fi
 
-# the images are private. cf hands these to the cell as the pull secret: a json key of the
-# read-only service account mogul-cf-image-puller, kept in bitwarden.
+# the images are private. cf hands the cell a pull credential: username _json_key, and a json
+# key of the read-only service account mogul-cf-image-puller, kept in the bitwarden item
+# mogul-cf-image-puller-key.
 if [ -z "${CF_DOCKER_PASSWORD:-}" ]; then
-  KEY_FILE="${MOGUL_CF_IMAGE_PULLER_KEY_FILE:-$HOME/mogul-cf-image-puller-key.json}"
-  [ -f "$KEY_FILE" ] || { echo "set CF_DOCKER_PASSWORD, or put the key in $KEY_FILE" >&2; exit 1; }
-  export CF_DOCKER_PASSWORD="$(cat "$KEY_FILE")"
+  bw unlock --check >/dev/null 2>&1 </dev/null || { echo "bitwarden is locked: run bw-unlock first" >&2; exit 1; }
+  CF_DOCKER_PASSWORD="$(bw get item mogul-cf-image-puller-key </dev/null | jq -r '.notes // .login.password // empty')"
+  export CF_DOCKER_PASSWORD
 fi
+jq -e '.type == "service_account"' <<<"$CF_DOCKER_PASSWORD" >/dev/null 2>&1 ||
+  { echo "CF_DOCKER_PASSWORD is not a service account's json key" >&2; exit 1; }
 
 var(){ awk -v k="$1:" '$1 == k {print $2}' "$VARS_FILE"; }
 REGISTRY="$(var registry)"

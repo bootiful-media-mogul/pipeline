@@ -8,7 +8,8 @@ The foundation itself is built by `cf/`; Mogul's foundation, and what is still o
 ```bash
 cd ~/code/mogul/cf && eval "$(./up.sh shell)"
 cd ~/code/mogul/cf-pipeline
-source bin/env-from-gke.sh     # or: bw-unlock && source ~/code/mogul/workspace/bin/env.sh
+bw-unlock                      # for the image pull key
+source bin/env-from-gke.sh     # production's secrets
 bin/deploy.sh                  # every app, or name some: bin/deploy.sh gateway client
 ```
 
@@ -40,11 +41,13 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 ## Secrets
 
 The secrets come from the environment, and are only ever written to a temporary file that is deleted when `bin/deploy.sh` exits.
-`workspace/bin/env.java` doesn't export all of them yet (`REDIS_*`, `SETTINGS_PASSWORD` and `SETTINGS_SALT` are missing), which is why `bin/env-from-gke.sh` exists: `mogul-secrets` on GKE is the one complete copy today.
+They have to be production's, and `mogul-secrets` on GKE is the one complete copy today, so `bin/env-from-gke.sh` reads them from there.
+Don't use `workspace/bin/env.sh` for this: it is the local development environment, and points the database and RabbitMQ at localhost.
 
 The images are private.
 `cf push` gives the cell a pull credential: username `_json_key`, password a JSON key of the service account `mogul-cf-image-puller@joshlong.iam.gserviceaccount.com`, which can only read `mogul-artifact-registry`.
-`bin/deploy.sh` takes it from `CF_DOCKER_PASSWORD`, or else from the file `MOGUL_CF_IMAGE_PULLER_KEY_FILE` (default `~/mogul-cf-image-puller-key.json`).
+The key is in Bitwarden, in the item `mogul-cf-image-puller-key` (as its notes or its password), and `bin/deploy.sh` reads it from there with `bw`, so the vault has to be unlocked; `CF_DOCKER_PASSWORD`, if set, takes precedence.
+If the key is ever lost, make a new one (`gcloud iam service-accounts keys create`), save it to the same item, and delete the old key.
 
 ## Things to know
 
