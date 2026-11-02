@@ -4,13 +4,13 @@
 #   bin/deploy.sh [--vars vars/<foundation>.yml] [app...]
 #
 # with no apps, it pushes all of them. cf has to be logged in already (in the cf repository:
-# eval "$(./up.sh shell)"); it targets the org and space the vars file names, creating them
+# eval "$(./up.sh --env typical.env shell)"); it targets the org and space the vars file names, creating them
 # the first time.
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-VARS_FILE="$ROOT_DIR/vars/default.yml"
+VARS_FILE="$ROOT_DIR/vars/typical.yml"
 APPS=()
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -29,7 +29,7 @@ SECRETS="ABLY_KEY AUTH0_CLIENT_ID AUTH0_CLIENT_SECRET AUTH0_DOMAIN AWS_ACCESS_KE
   AWS_ACCESS_KEY_SECRET AWS_REGION DB_HOST DB_PASSWORD DB_SCHEMA DB_USERNAME
   ELASTICSEARCH_API_HOST ELASTICSEARCH_API_KEY ELASTICSEARCH_OTEL_HEADER ELASTICSEARCH_OTEL_HOST
   OPENAI_KEY REDIS_HOST REDIS_PASSWORD REDIS_PORT RMQ_HOST RMQ_PASSWORD RMQ_USERNAME
-  RMQ_VIRTUAL_HOST SETTINGS_PASSWORD SETTINGS_SALT WP_CLIENT_ID WP_CLIENT_SECRET"
+  RMQ_VIRTUAL_HOST SETTINGS_PASSWORD SETTINGS_SALT"
 
 missing=""
 for s in $SECRETS; do

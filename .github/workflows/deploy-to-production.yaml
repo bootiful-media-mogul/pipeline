@@ -1,0 +1,83 @@
+name: Deploy to Cloud Foundry
+
+on:
+  repository_dispatch:
+    types: [update-event]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Push production apps
+    runs-on: ubuntu-24.04
+    env:
+      CF_API: https://api.cf.applicationconcierge.com
+      CF_USERNAME: ${{ secrets.CF_USERNAME }}
+      CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+      CF_DOCKER_PASSWORD: ${{ secrets.CF_DOCKER_PASSWORD }}
+      ABLY_KEY: ${{ secrets.ABLY_KEY }}
+      AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+      AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+      AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      ELASTICSEARCH_API_HOST: ${{ secrets.ELASTICSEARCH_API_HOST }}
+      ELASTICSEARCH_API_KEY: ${{ secrets.ELASTICSEARCH_API_KEY }}
+      ELASTICSEARCH_OTEL_HEADER: ${{ secrets.ELASTICSEARCH_OTEL_HEADER }}
+      ELASTICSEARCH_OTEL_HOST: ${{ secrets.ELASTICSEARCH_OTEL_HOST }}
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      RMQ_HOST: ${{ secrets.RMQ_HOST }}
+      RMQ_PASSWORD: ${{ secrets.RMQ_PASSWORD }}
+      RMQ_USERNAME: ${{ secrets.RMQ_USERNAME }}
+      RMQ_VIRTUAL_HOST: ${{ secrets.RMQ_VIRTUAL_HOST }}
+      SETTINGS_PASSWORD: ${{ secrets.SETTINGS_PASSWORD }}
+      SETTINGS_SALT: ${{ secrets.SETTINGS_SALT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SA_KEY }}
+
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Install Cloud Foundry CLI
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key |
+            sudo gpg --dearmor -o /usr/share/keyrings/cli.cloudfoundry.org.gpg
+          echo 'deb [signed-by=/usr/share/keyrings/cli.cloudfoundry.org.gpg] https://packages.cloudfoundry.org/debian stable main' |
+            sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list >/dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y cf8-cli
+          cf version
+
+      - name: Authenticate to Cloud Foundry
+        run: |
+          set -euo pipefail
+          : "${CF_USERNAME:?CF_USERNAME is required}"
+          : "${CF_PASSWORD:?CF_PASSWORD is required}"
+          : "${CF_DOCKER_PASSWORD:?CF_DOCKER_PASSWORD is required}"
+          cf api "$CF_API"
+          cf auth "$CF_USERNAME" "$CF_PASSWORD"
+
+      - name: Deploy all apps
+        run: ./bin/deploy.sh

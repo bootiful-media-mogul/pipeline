@@ -50,8 +50,6 @@ applications:
       RMQ_VIRTUAL_HOST: ((RMQ_VIRTUAL_HOST))
       SETTINGS_PASSWORD: ((SETTINGS_PASSWORD))
       SETTINGS_SALT: ((SETTINGS_SALT))
-      WP_CLIENT_ID: ((WP_CLIENT_ID))
-      WP_CLIENT_SECRET: ((WP_CLIENT_SECRET))
 
   # the vue spa, served by nginx (a paketo image built by the client's own workflow). the only
   # thing it reads is where the api is, which nginx hands the spa as /config.js; none of the
@@ -89,7 +87,7 @@ applications:
 
   # the headless worker: no route, and so no http health check. the process being alive is
   # the right signal for it, as on GKE. the cell's graceful shutdown interval
-  # (CF_GRACEFUL_SHUTDOWN_SECONDS in cf/.env) gives JobRunr its four minutes on a stop.
+  # (CF_GRACEFUL_SHUTDOWN_SECONDS in cf/typical.env) gives JobRunr its four minutes on a stop.
   - name: processors
     docker:
       image: ((registry))/processors@((processors-digest))
