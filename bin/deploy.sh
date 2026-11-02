@@ -59,7 +59,6 @@ SPACE="$(var space)"
 
 cf oauth-token >/dev/null || { echo "cf is not logged in" >&2; exit 1; }
 cf org "$ORG" >/dev/null 2>&1 || cf create-org "$ORG"
-cf space "$ORG" >/dev/null 2>&1 || cf create-org "$SPACE"
 cf space "$SPACE" -o "$ORG" >/dev/null 2>&1 || cf create-space "$SPACE" -o "$ORG"
 cf target -o "$ORG" -s "$SPACE"
 
@@ -73,10 +72,12 @@ done
 
 # pin what :latest is right now, the way kbld does for GKE, so a restart months from now runs
 # the image that was deployed and not whatever was pushed since. cf interpolates the whole
-# manifest even to push one app, so every app needs its digest.
+# manifest even to push one app, so every app needs its digest. tags list needs only Artifact
+# Registry access; images describe also queries Container Analysis, which this CI account lacks.
 for app in "${ALL_APPS[@]}"; do
-  DIGEST="$(gcloud artifacts docker images describe "$REGISTRY/$app:latest" \
-    --format='value(image_summary.digest)')"
+  DIGEST="$(gcloud artifacts docker tags list "$REGISTRY/$app" --format=json |
+    jq -er '[.[] | select(.tag | endswith("/tags/latest")) | .version | split("/")[-1]] |
+      if length == 1 then .[0] else error("expected exactly one latest tag") end')"
   echo "$app-digest: $DIGEST" >>"$SECRETS_FILE"
 done
 
