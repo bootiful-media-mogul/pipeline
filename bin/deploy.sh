@@ -19,11 +19,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 # every app in the manifest, in order
-ALL_APPS=($(awk '/^  - name:/ {print $3}' "$ROOT_DIR/manifest.yml"))
+ALL_APPS=()
+while read -r app; do ALL_APPS+=("$app"); done < <(awk '/^  - name:/ {print $3}' "$ROOT_DIR/manifest.yml")
 [ ${#APPS[@]} -gt 0 ] || APPS=("${ALL_APPS[@]}")
 
 # the same secrets every pod on GKE gets from mogul-secrets. they come from the environment
-# (bin/env-from-gke.sh) and only ever reach a temporary vars file. not workspace/bin/env.sh:
+# (bin/env-from-bitwarden.sh) and only ever reach a temporary vars file. not workspace/bin/env.sh:
 # that is the local development environment, with localhost for the database and rabbitmq.
 SECRETS="ABLY_KEY AUTH0_CLIENT_ID AUTH0_CLIENT_SECRET AUTH0_DOMAIN AWS_ACCESS_KEY_ID
   AWS_ACCESS_KEY_SECRET AWS_REGION DB_HOST DB_PASSWORD DB_SCHEMA DB_USERNAME
@@ -37,7 +38,7 @@ for s in $SECRETS; do
 done
 if [ -n "$missing" ]; then
   echo "these are not set:$missing" >&2
-  echo "load them first: source bin/env-from-gke.sh" >&2
+  echo "load them first: source bin/env-from-bitwarden.sh" >&2
   exit 1
 fi
 

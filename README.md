@@ -8,8 +8,8 @@ The foundation itself is built by `cf/`; Mogul's foundation, and what is still o
 ```bash
 cd ~/code/mogul/cf && eval "$(./up.sh --env typical.env shell)"
 cd ~/code/mogul/pipeline
-bw-unlock                      # for the image pull key
-source bin/env-from-gke.sh     # production's secrets
+bw-unlock                      # for the image pull key and production's secrets
+source bin/env-from-bitwarden.sh
 bin/deploy.sh                  # every app, or name some: bin/deploy.sh gateway client
 ```
 
@@ -27,7 +27,8 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 | `manifest.yml` | all four apps; every value that differs by foundation or is secret is a `((var))` |
 | `vars/typical.yml` | names and hosts for the typical foundation (`cf/typical.env`), where `mogul.tools` is a private domain of the `mogul` org; no secrets |
 | `bin/deploy.sh` | resolves digests, writes the secrets to a temporary vars file, pushes |
-| `bin/env-from-gke.sh` | exports the secrets from `mogul-secrets` on the GKE production cluster |
+| `bin/env-from-bitwarden.sh` | exports production's secrets from the Bitwarden item `mogul-production-secrets`; sourced |
+| `bin/secrets-to-bitwarden.sh` | copies `mogul-secrets` from the GKE cluster into that item, while the cluster exists |
 
 ## Mapping from the GKE pipeline
 
@@ -45,7 +46,9 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 ## Secrets
 
 The secrets come from the environment, and are only ever written to a temporary file that is deleted when `bin/deploy.sh` exits.
-They have to be production's, and `mogul-secrets` on GKE is the one complete copy today, so `bin/env-from-gke.sh` reads them from there.
+They have to be production's.
+They are kept in Bitwarden, in the secure note `mogul-production-secrets` (folder `mogul`), one hidden field per variable, and `source bin/env-from-bitwarden.sh` exports them.
+The note was copied from `mogul-secrets` on the GKE cluster `joshlong` with `bin/secrets-to-bitwarden.sh`, which reads it back and checks it; run it again if a secret changes there before the cluster goes. After that, the note is the one copy to change, together with the matching GitHub Actions secret.
 Don't use `workspace/bin/env.sh` for this: it is the local development environment, and points the database and RabbitMQ at localhost.
 
 For GitHub Actions, set the following Actions secrets on `bootiful-media-mogul/pipeline` (or make org secrets available to that repository): `GCLOUD_SA_KEY` for read access to the Artifact Registry image digests, `CF_USERNAME` and `CF_PASSWORD` for the Cloud Foundry API, and `CF_DOCKER_PASSWORD` for the read-only image pull service account's JSON key. Set all production app secrets named in the `env` section of `.github/workflows/deploy-to-production.yaml` too. The workflow maps those secrets to the variables required by `bin/deploy.sh`; a missing value fails deployment before any app is pushed.
