@@ -1,0 +1,13 @@
+---
+# the bare domain, ((domain)): redirects every request to the studio. see ../README.md.
+applications:
+  - name: redirect
+    buildpacks: [go_buildpack]
+    memory: 32M
+    disk_quota: 256M
+    instances: 1
+    routes:
+      - route: ((domain))
+    env:
+      TARGET: https://((gateway-host)).((domain))
+      GOPACKAGENAME: github.com/bootiful-media-mogul/pipeline/redirect

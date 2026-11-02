@@ -3,7 +3,8 @@
 #
 #   bin/deploy.sh [--vars vars/<foundation>.yml] [app...]
 #
-# with no apps, it pushes all of them. cf has to be logged in already (in the cf repository:
+# with no apps, it pushes all of them: the four in manifest.yml, from their images, and redirect
+# (redirect/), which sends the bare domain to the studio, built by the go buildpack. cf has to be logged in already (in the cf repository:
 # eval "$(./up.sh --env typical.env shell)"); it targets the org and space the vars file names, creating them
 # the first time.
 
@@ -21,7 +22,7 @@ done
 # every app in the manifest, in order
 ALL_APPS=()
 while read -r app; do ALL_APPS+=("$app"); done < <(awk '/^  - name:/ {print $3}' "$ROOT_DIR/manifest.yml")
-[ ${#APPS[@]} -gt 0 ] || APPS=("${ALL_APPS[@]}")
+[ ${#APPS[@]} -gt 0 ] || APPS=("${ALL_APPS[@]}" redirect)
 
 # the same secrets every pod on GKE gets from mogul-secrets. they come from the environment
 # (bin/env-from-bitwarden.sh) and only ever reach a temporary vars file. not workspace/bin/env.sh:
@@ -83,6 +84,12 @@ for app in "${ALL_APPS[@]}"; do
 done
 
 for app in "${APPS[@]}"; do
+  if [ "$app" = redirect ]; then
+    # no secrets and no image: only the vars file.
+    echo "------------------ $app"
+    cf push -f "$ROOT_DIR/redirect/manifest.yml" -p "$ROOT_DIR/redirect" --vars-file "$VARS_FILE" --strategy rolling
+    continue
+  fi
   echo "------------------ $app $(awk -v k="$app-digest:" '$1 == k {print $2}' "$SECRETS_FILE")"
   cf push "$app" -f "$ROOT_DIR/manifest.yml" --vars-file "$VARS_FILE" --vars-file "$SECRETS_FILE" \
     --strategy rolling |

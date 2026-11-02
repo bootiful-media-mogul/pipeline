@@ -1,6 +1,6 @@
 # pipeline
 
-Deploys Mogul's four applications (`gateway`, `client`, `api`, `processors`) to Cloud Foundry from the container images built by their own repositories. The old GKE deployment is in `k8s-pipeline/`.
+Deploys Mogul's four applications (`gateway`, `client`, `api`, `processors`) to Cloud Foundry from the container images built by their own repositories, and `redirect`, which sends the bare domain (`https://mogul.tools`) to the studio. The old GKE deployment is in `k8s-pipeline/`.
 The foundation itself is built by `cf/`; Mogul's foundation, and what is still open before Mogul moves, are in `workspace/docs/cf.md`.
 
 ## Deploying
@@ -26,6 +26,7 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 |---|---|
 | `manifest.yml` | all four apps; every value that differs by foundation or is secret is a `((var))` |
 | `vars/typical.yml` | names and hosts for the typical foundation (`cf/typical.env`), where `mogul.tools` is a private domain of the `mogul` org; no secrets |
+| `redirect/` | a few lines of Go, pushed with the Go buildpack: answers the bare domain with a 302 to `https://<gateway-host>.<domain>`, keeping the path and query |
 | `bin/deploy.sh` | resolves digests, writes the secrets to a temporary vars file, pushes |
 | `bin/env-from-bitwarden.sh` | exports production's secrets from the Bitwarden item `mogul-production-secrets`; sourced |
 | `bin/secrets-to-bitwarden.sh` | copies `mogul-secrets` from the GKE cluster into that item, while the cluster exists |
