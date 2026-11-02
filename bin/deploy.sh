@@ -59,6 +59,7 @@ SPACE="$(var space)"
 
 cf oauth-token >/dev/null || { echo "cf is not logged in" >&2; exit 1; }
 cf org "$ORG" >/dev/null 2>&1 || cf create-org "$ORG"
+cf space "$ORG" >/dev/null 2>&1 || cf create-org "$SPACE"
 cf space "$SPACE" -o "$ORG" >/dev/null 2>&1 || cf create-space "$SPACE" -o "$ORG"
 cf target -o "$ORG" -s "$SPACE"
 
