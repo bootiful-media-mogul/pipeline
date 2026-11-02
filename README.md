@@ -25,7 +25,7 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 | File | Holds |
 |---|---|
 | `manifest.yml` | all four apps; every value that differs by foundation or is secret is a `((var))` |
-| `vars/typical.yml` | names and hosts for the typical foundation (`cf/typical.env`), where `mogul.pub` is a private domain of the `mogul` org; no secrets |
+| `vars/typical.yml` | names and hosts for the typical foundation (`cf/typical.env`), where `mogul.tools` is a private domain of the `mogul` org; no secrets |
 | `bin/deploy.sh` | resolves digests, writes the secrets to a temporary vars file, pushes |
 | `bin/env-from-gke.sh` | exports the secrets from `mogul-secrets` on the GKE production cluster |
 
@@ -39,7 +39,7 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 | `readinessProbe` on `/actuator/health/readiness` | `health-check-type: http` on the same endpoint |
 | `expose: false` (processors) | `no-route: true`, `health-check-type: process` |
 | `terminationGracePeriodSeconds: 300` | the foundation's `CF_GRACEFUL_SHUTDOWN_SECONDS`, which applies to every app |
-| Ingress, ManagedCertificate, static IP | a route under `mogul.pub`, a private domain whose wildcard certificate the foundation issues (`cf/README.md`, "Custom domains") |
+| Ingress, ManagedCertificate, static IP | a route under `mogul.tools`, a private domain whose wildcard certificate the foundation issues (`cf/README.md`, "Custom domains") |
 | KEDA `ScaledObject` (processors) | nothing yet: one fixed instance |
 
 ## Secrets
@@ -60,5 +60,5 @@ If the key is ever lost, make a new one (`gcloud iam service-accounts keys creat
 
 - **These apps share production's backing services.** api and processors on Cloud Foundry are more replicas of production: they use the production database, RabbitMQ and JobRunr tables, and processors takes real jobs.
   So `bin/deploy.sh` pushing an image with a new Flyway migration migrates the production database, exactly as a GKE deploy would.
-- **Login needs an Auth0 callback.** Auth0 only accepts the callback URLs it lists, so add `https://studio.mogul.pub/login/oauth2/code/auth0` to the application's allowed callback URLs (and `https://studio.mogul.pub` to logout URLs and web origins, and `https://studio.mogul.pub/oauth2/code/wordpress` to the WordPress.com app's redirect URLs) before logging in through the gateway on Cloud Foundry.
+- **Login needs an Auth0 callback.** Auth0 only accepts the callback URLs it lists. `https://studio.mogul.tools/login/oauth2/code/auth0` (and `https://studio.mogul.tools/oauth2/code/wordpress` in the WordPress.com app) are registered already, because production on GKE uses the same names; a gateway on any other host needs its own added first.
 - **The gateway reaches api and client through their public routes**, as it does on GKE (`MOGUL_SERVICE_HOST`, `MOGUL_CLIENT_HOST` in `vars/typical.yml`).
