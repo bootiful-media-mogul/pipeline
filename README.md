@@ -1,21 +1,23 @@
 # pipeline
 
 Deploys Mogul's four applications (`gateway`, `client`, `api`, `processors`) to Cloud Foundry from the container images built by their own repositories, and `redirect`, which sends the bare domain (`https://mogul.tools`) to the studio. The old GKE deployment is in `k8s-pipeline/`.
-The foundation itself is built by `cf/`; Mogul's foundation, and what is still open before Mogul moves, are in `workspace/docs/cf.md`.
+The foundation itself is built by `bosh-platform-installer` (`mypaas.env`, `api.cf.mypaas.online`); Mogul's foundation, and what is still open, are in `workspace/docs/cf.md`.
 
 ## Deploying
 
 ```bash
-cd ~/code/mogul/cf && eval "$(./up.sh --env typical.env shell)"
+cd ~/code/application-concierge/bosh-platform-installer && ./up.sh --env mypaas.env admin   # the api and a login
+cf login -a https://api.cf.mypaas.online
 cd ~/code/mogul/pipeline
 bw-unlock                      # for the image pull key and production's secrets
 source bin/env-from-bitwarden.sh
 bin/deploy.sh                  # every app, or name some: bin/deploy.sh gateway client
 ```
 
-Mogul's foundation is the typical one (`cf/typical.env`, `api.cf.applicationconcierge.com`); `--vars vars/<foundation>.yml` names another.
+Mogul's foundation is mypaas (`bosh-platform-installer/mypaas.env`, `api.cf.mypaas.online`), and `vars/mypaas.yml` is the default; `--vars vars/<foundation>.yml` names another.
+`vars/typical.yml` is the earlier foundation on GKE (`cf/typical.env`, `api.cf.applicationconcierge.com`), until it is gone.
 
-The GitHub Actions workflow deploys all four apps on a push to this repository's `main` branch, a manual run, or an `update-event` repository dispatch. The client build sends that dispatch directly; the api, gateway and processors builds send it through `github-actions-setup-container-build-env`. Concurrent deploys queue so a later build cannot overlap a deployment already in progress. GitHub Actions uses `vars/typical.yml` and does not need access to the GKE cluster.
+The GitHub Actions workflow deploys all four apps on a push to this repository's `main` branch, a manual run, or an `update-event` repository dispatch. The client build sends that dispatch directly; the api, gateway and processors builds send it through `github-actions-setup-container-build-env`. Concurrent deploys queue so a later build cannot overlap a deployment already in progress. GitHub Actions uses the vars file its `VARS_FILE` names, `vars/mypaas.yml`, which also holds the foundation's API (`cf-api`).
 
 `bin/deploy.sh` pins each app's `:latest` to its current digest (as kbld does for GKE), and runs `cf push --strategy rolling` for each app named, into the org and space the vars file names (`mogul` / `production`), creating them the first time.
 It hides the manifest diff `cf push` prints, because that diff includes the environment.
@@ -25,7 +27,8 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 | File | Holds |
 |---|---|
 | `manifest.yml` | all four apps; every value that differs by foundation or is secret is a `((var))` |
-| `vars/typical.yml` | names and hosts for the typical foundation (`cf/typical.env`), where `mogul.tools` is a private domain of the `mogul` org; no secrets |
+| `vars/mypaas.yml` | the foundation's API, and names and hosts, for mypaas, where `mogul.tools` is a private domain of the `mogul` org; no secrets |
+| `vars/typical.yml` | the same for the earlier foundation on GKE (`cf/typical.env`) |
 | `redirect/` | a few lines of Go, pushed with the Go buildpack: answers the bare domain with a 302 to `https://<gateway-host>.<domain>`, keeping the path and query |
 | `bin/deploy.sh` | resolves digests, writes the secrets to a temporary vars file, pushes |
 | `bin/env-from-bitwarden.sh` | exports production's secrets from the Bitwarden item `mogul-production-secrets`; sourced |
@@ -41,7 +44,7 @@ It hides the manifest diff `cf push` prints, because that diff includes the envi
 | `readinessProbe` on `/actuator/health/readiness` | `health-check-type: http` on the same endpoint |
 | `expose: false` (processors) | `no-route: true`, `health-check-type: process` |
 | `terminationGracePeriodSeconds: 300` | the foundation's `CF_GRACEFUL_SHUTDOWN_SECONDS`, which applies to every app |
-| Ingress, ManagedCertificate, static IP | a route under `mogul.tools`, a private domain whose wildcard certificate the foundation issues (`cf/README.md`, "Custom domains") |
+| Ingress, ManagedCertificate, static IP | a route under `mogul.tools`, a private domain whose certificate and DNS `bosh-platform-installer/app-domain.sh` sets up |
 | KEDA `ScaledObject` (processors) | nothing yet: one fixed instance |
 
 ## Secrets
@@ -52,7 +55,7 @@ They are kept in Bitwarden, in the secure note `mogul-production-secrets` (folde
 The note was copied from `mogul-secrets` on the GKE cluster `joshlong` with `bin/secrets-to-bitwarden.sh`, which reads it back and checks it; run it again if a secret changes there before the cluster goes. After that, the note is the one copy to change, together with the matching GitHub Actions secret.
 Don't use `workspace/bin/env.sh` for this: it is the local development environment, and points the database and RabbitMQ at localhost.
 
-For GitHub Actions, set the following Actions secrets on `bootiful-media-mogul/pipeline` (or make org secrets available to that repository): `GCLOUD_SA_KEY` for read access to the Artifact Registry image digests, `CF_USERNAME` and `CF_PASSWORD` for the Cloud Foundry API, and `CF_DOCKER_PASSWORD` for the read-only image pull service account's JSON key. Set all production app secrets named in the `env` section of `.github/workflows/deploy-to-production.yaml` too. The workflow maps those secrets to the variables required by `bin/deploy.sh`; a missing value fails deployment before any app is pushed.
+For GitHub Actions, set the following Actions secrets on `bootiful-media-mogul/pipeline` (or make org secrets available to that repository): `GCLOUD_SA_KEY` for read access to the Artifact Registry image digests, `CF_USERNAME` and `CF_PASSWORD` for the Cloud Foundry API (on mypaas, the user `mogul-deployer`, a space developer of `mogul/production` only, whose password is in the foundation's CredHub, `/mypaas/mogul/deployer_password`), and `CF_DOCKER_PASSWORD` for the read-only image pull service account's JSON key. Set all production app secrets named in the `env` section of `.github/workflows/deploy-to-production.yaml` too. The workflow maps those secrets to the variables required by `bin/deploy.sh`; a missing value fails deployment before any app is pushed.
 WordPress OAuth client credentials come from each Mogul's `wordpress` settings page. The gateway reads `clientId` and `clientSecret` through the settings API; no `WP_CLIENT_ID` or `WP_CLIENT_SECRET` Actions secret is needed.
 
 The images are private.

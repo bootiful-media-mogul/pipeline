@@ -1,0 +1,25 @@
+# the names and hosts of mogul on the mypaas foundation (bosh-platform-installer/mypaas.env,
+# api.cf.mypaas.online), where mogul.tools is a private domain of the mogul org: studio.mogul.tools,
+# not studio.apps.mypaas.online. no secrets here: bin/deploy.sh adds those from the environment.
+
+# the foundation's api, for the github actions workflow.
+cf-api: https://api.cf.mypaas.online
+
+# where the apps go. bin/deploy.sh targets these itself.
+org: mogul
+space: production
+
+registry: us-docker.pkg.dev/joshlong/mogul-artifact-registry
+domain: mogul.tools
+gateway-host: studio
+client-host: ui
+api-host: api
+
+# where the apps find each other. the gateway proxies to these, the same way production's does.
+MOGUL_SERVICE_HOST: https://api.mogul.tools
+MOGUL_GATEWAY_HOST: https://studio.mogul.tools
+MOGUL_CLIENT_HOST: https://ui.mogul.tools
+MOGUL_FEEDS_NAMESPACE: http://api.mogul.tools
+
+MOGUL_MANAGED_FILES_S3_BUCKET: mogul-managedfiles
+MOGUL_AWS_CLOUDFRONT_DOMAIN: https://d3qy1h6z3g7kc1.cloudfront.net

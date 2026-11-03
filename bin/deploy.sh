@@ -4,14 +4,14 @@
 #   bin/deploy.sh [--vars vars/<foundation>.yml] [app...]
 #
 # with no apps, it pushes all of them: the four in manifest.yml, from their images, and redirect
-# (redirect/), which sends the bare domain to the studio, built by the go buildpack. cf has to be logged in already (in the cf repository:
-# eval "$(./up.sh --env typical.env shell)"); it targets the org and space the vars file names, creating them
-# the first time.
+# (redirect/), which sends the bare domain to the studio, built by the go buildpack. cf has to be
+# logged in already (in bosh-platform-installer: ./up.sh --env mypaas.env admin, then cf login);
+# it targets the org and space the vars file names, creating them the first time.
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-VARS_FILE="$ROOT_DIR/vars/typical.yml"
+VARS_FILE="$ROOT_DIR/vars/mypaas.yml"
 APPS=()
 while [ $# -gt 0 ]; do
   case "$1" in
