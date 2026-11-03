@@ -60,8 +60,11 @@ ORG="$(var org)"
 SPACE="$(var space)"
 
 cf oauth-token >/dev/null || { echo "cf is not logged in" >&2; exit 1; }
-cf org "$ORG" >/dev/null 2>&1 || cf create-org "$ORG"
-cf space "$SPACE" -o "$ORG" >/dev/null 2>&1 || cf create-space "$SPACE" -o "$ORG"
+# creating them takes an admin; a deployer that is only the space's developer can target them.
+if ! cf target -o "$ORG" -s "$SPACE" >/dev/null 2>&1; then
+  cf org "$ORG" >/dev/null 2>&1 || cf create-org "$ORG"
+  cf create-space "$SPACE" -o "$ORG"
+fi
 cf target -o "$ORG" -s "$SPACE"
 
 SECRETS_FILE="$(mktemp)"
