@@ -87,7 +87,7 @@ applications:
 
   # the headless worker: no route, and so no http health check. the process being alive is
   # the right signal for it, as on GKE. the cell's graceful shutdown interval
-  # (CF_GRACEFUL_SHUTDOWN_SECONDS in cf/typical.env) gives JobRunr its four minutes on a stop.
+  # (CF_GRACEFUL_SHUTDOWN_SECONDS in bosh-platform-installer/mypaas.env) gives JobRunr its four minutes on a stop.
   - name: processors
     docker:
       image: ((registry))/processors@((processors-digest))
